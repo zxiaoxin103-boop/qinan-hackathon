@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=2.0,user-scalable=yes">
+<title>亲安 — 亲人安心</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;overflow:hidden;position:fixed;inset:0;width:100%;height:100%;-webkit-user-select:none;user-select:none}
+
+/* ===== SPLASH ===== */
+.splash{position:fixed;inset:0;z-index:999;background:#f5f0e8;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,transform .6s ease}
+.splash.hide{opacity:0;transform:scale(1.1);pointer-events:none}
+.logo{width:140px;height:140px;border-radius:32px;background:linear-gradient(135deg,#e89a5c,#d88a3e);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 40px rgba(232,154,92,0.3);margin-bottom:18px;animation:logoIn .8s cubic-bezier(.15,.75,.3,1)}
+@keyframes logoIn{0%{transform:scale(0.5) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+.logo-text{font-size:36px;font-weight:700;color:#e89a5c;letter-spacing:4px;animation:textIn .8s .2s both}
+@keyframes textIn{0%{transform:translateY(10px);opacity:0}100%{transform:translateY(0);opacity:1}}
+.logo-sub{font-size:15px;color:#ccc;letter-spacing:6px;margin-top:4px;animation:textIn .8s .4s both}
+.splash-foot{position:absolute;bottom:40px;font-size:13px;color:#ddd;letter-spacing:2px;animation:textIn .8s .6s both}
+
+/* ===== MAIN ===== */
+.page-wrap{display:flex;height:100%;width:100vw;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+.page-wrap::-webkit-scrollbar{display:none}
+.page{min-width:100vw;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 24px 100px;position:relative;scroll-snap-align:start;scroll-snap-stop:always}
+
+.settings-btn{position:fixed;top:16px;right:16px;z-index:100;width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.6);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#999;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+
+.top-bar{position:fixed;top:0;left:0;right:0;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:50;pointer-events:none}
+.top-bar .time{font-size:14px;font-weight:600;color:#999;letter-spacing:0.5px}
+
+.dots{position:fixed;bottom:30px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:50;pointer-events:none}
+.dot{width:8px;height:8px;border-radius:50%;background:#ddd;transition:all .4s}
+.dot.active{background:#e89a5c;width:26px;border-radius:5px}
+
+.card{width:88%;max-width:400px;background:rgba(255,255,255,0.85);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-radius:28px;padding:36px 24px;box-shadow:0 8px 40px rgba(0,0,0,0.06);display:flex;flex-direction:column;align-items:center;text-align:center;border:1px solid rgba(255,255,255,0.5)}
+.card-icon{width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,#fdf0e4,#fce6d4);display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 4px 16px rgba(232,154,92,0.12)}
+.page-title{font-size:32px;font-weight:700;color:#2c2c2c;margin-bottom:4px;line-height:1.3}
+.page-sub{font-size:16px;color:#aaa;margin-bottom:24px}
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div class="splash" id="splash">
+  <div class="logo"><img src="logo.png" alt="亲安" style="width:100%;height:100%;border-radius:32px;object-fit:cover"></div>
+  <div class="logo-text">亲 安</div>
+  <div class="logo-sub">亲人安心</div>
+  <div class="splash-foot">让爱 · 看得见</div>
+</div>
+
+<!-- MAIN -->
+<div class="page-wrap" id="wrap">
+  <div class="page">
+    <div class="card">
+      <div class="card-icon">📸</div>
+      <div class="page-title">拍药盒</div>
+      <div class="page-sub">拍一拍，自动读出来</div>
+      <div style="font-size:15px;color:#aaa">功能开发中...</div>
+    </div>
+  </div>
+  <div class="page">
+    <div class="card">
+      <div class="card-icon">🛡️</div>
+      <div class="page-title">防诈骗</div>
+      <div class="page-sub">查一下安不安全</div>
+      <div style="font-size:15px;color:#aaa">功能开发中...</div>
+    </div>
+  </div>
+  <div class="page">
+    <div class="card">
+      <div class="card-icon">🤸</div>
+      <div class="page-title">摔倒检测</div>
+      <div class="page-sub">时刻守护您的安全</div>
+      <div style="font-size:15px;color:#aaa">功能开发中...</div>
+    </div>
+  </div>
+</div>
+
+<button class="settings-btn">⚙️</button>
+
+<div class="top-bar">
+  <span class="time" id="topTime">12:00</span>
+</div>
+
+<div class="dots" id="dots">
+  <div class="dot active"></div>
+  <div class="dot"></div>
+  <div class="dot"></div>
+</div>
+
+<script>
+// ===== Time =====
+function updateTime() {
+  const d = new Date();
+  document.getElementById('topTime').textContent = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+updateTime();
+setInterval(updateTime, 30000);
+
+// ===== Splash → Main =====
+setTimeout(() => {
+  document.getElementById('splash').classList.add('hide');
+}, 1500);
+
+// ===== Dots =====
+const wrap = document.getElementById('wrap');
+const dots = document.querySelectorAll('.dot');
+wrap.addEventListener('scroll', () => {
+  const i = Math.round(wrap.scrollLeft / window.innerWidth);
+  dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+});
+</script>
+</body>
+</html>
