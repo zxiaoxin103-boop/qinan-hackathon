@@ -42,11 +42,18 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
 .main-btn:active{transform:scale(0.95);box-shadow:0 3px 12px rgba(232,154,92,0.2)}
 .main-btn .icon{display:flex;align-items:center;justify-content:center;margin-bottom:4px}
 .tag{display:inline-block;padding:4px 14px;border-radius:20px;background:#fdf0e4;color:#e89a5c;font-size:13px;font-weight:500}
-.ocr-result{width:100%;margin-top:14px;padding:14px;border-radius:14px;background:#faf8f5;font-size:17px;color:#333;text-align:center;display:none;line-height:1.6;border:1px solid #eee}
+.ocr-result{width:100%;max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-top:14px;padding:14px;border-radius:14px;background:#faf8f5;font-size:17px;color:#333;text-align:left;display:none;line-height:1.6;border:1px solid #eee;white-space:pre-wrap}
 .ocr-result.show{display:block}
 .ocr-loading{display:none;margin-top:10px;font-size:14px;color:#e89a5c}
 .ocr-loading.show{display:block}
 #fileInput{display:none}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;border-radius:24px;padding:24px;width:90%;max-width:400px;max-height:70vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 10px 40px rgba(0,0,0,0.2)}
+.modal-title{font-size:20px;font-weight:700;color:#2c2c2c;margin-bottom:12px}
+.modal-text{font-size:18px;line-height:1.7;color:#333;white-space:pre-wrap}
+.modal-close{margin-top:16px;width:100%;padding:12px;border:none;border-radius:14px;background:linear-gradient(135deg,#e89a5c,#d4823a);color:#fff;font-size:18px;font-weight:600;cursor:pointer}
+.modal-voice{margin-top:8px;width:100%;padding:10px;border:2px solid #e89a5c;border-radius:14px;background:#fff;color:#e89a5c;font-size:16px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
@@ -70,7 +77,7 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
       <button class="main-btn" onclick="document.getElementById('fileInput').click()">
         <span class="icon"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>拍照
       </button>
-      <input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+      <input type="file" id="fileInput" accept="image/*" onchange="handlePhoto(this)">
       <span class="tag">药品识别 · 生活助手</span>
       <div class="ocr-loading" id="ocrLoading">🔍 正在识别中...</div>
       <div class="ocr-result" id="ocrResult"></div>
@@ -108,6 +115,16 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
   <div class="dot active"></div>
   <div class="dot"></div>
   <div class="dot"></div>
+</div>
+
+<!-- OCR结果弹窗 -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-title">📋 识别结果</div>
+    <div class="modal-text" id="modalText"></div>
+    <button class="modal-voice" onclick="speakModal()">🔊 再听一遍</button>
+    <button class="modal-close" onclick="closeModal()">知道了</button>
+  </div>
 </div>
 
 <script>
@@ -159,24 +176,35 @@ function handlePhoto(input) {
             role: 'user',
             content: [
               { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + base64 } },
-              { type: 'text', text: '请识别这张图片上的所有文字内容，按顺序列出。如果是药品包装，请重点标出药品名称、用法用量、保质期。' }
+              { type: 'text', text: '这是一张药品包装的照片。请用最通俗易懂的话，像跟80岁老人解释一样，说清楚：1.这是什么药（名称）2.治什么病（用大白话，别说专业术语）3.怎么吃（直接说一次吃几粒/几片、一天吃几次、什么时候吃，不要说"400单位""mg"这种单位，直接换算成人话）4.注意事项（用一句话）。总字数控制在60字以内，语气亲切。如果照片不是药品，简单说是什么就行。' }
             ]
           }]
         })
       });
       const data = await resp.json();
       const text = data.choices?.[0]?.message?.content || '未识别到文字';
-      result.textContent = '📋 识别结果：\n' + text;
-      result.classList.add('show');
-      // 语音播报
-      speak(text);
+      showModal(text);
     } catch(err) {
-      result.textContent = '⚠️ 识别失败，请重试';
-      result.classList.add('show');
+      showModal('⚠️ 识别失败，请重试');
+      // result.classList.add('show');
     }
     loading.classList.remove('show');
   };
   reader.readAsDataURL(file);
+}
+
+// ===== 弹窗 =====
+function showModal(text) {
+  document.getElementById("modalText").textContent = text;
+  document.getElementById("modalOverlay").classList.add("show");
+  speak(text);
+}
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("show");
+  window.speechSynthesis.cancel();
+}
+function speakModal() {
+  speak(document.getElementById("modalText").textContent);
 }
 
 // ===== 语音播报 =====
