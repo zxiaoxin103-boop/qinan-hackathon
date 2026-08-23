@@ -85,6 +85,10 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
       </button>
       <input type="file" id="fileInput" accept="image/*" onchange="handlePhoto(this)">
       <span class="tag">药品识别 · 生活助手</span>
+      <div style="display:flex;align-items:center;gap:6px;background:rgba(232,154,92,0.08);border-radius:20px;padding:4px 14px;margin-top:10px;font-size:14px;color:#e89a5c;font-weight:500">
+        <span>💊</span><span>下次吃药</span><span id="pillTime">20:00</span>
+        <button onclick="remindPill()" style="margin-left:6px;padding:2px 10px;border:none;border-radius:10px;background:#e89a5c;color:#fff;font-size:12px;cursor:pointer">提醒</button>
+      </div>
       <div class="ocr-loading" id="ocrLoading">🔍 正在识别中...</div>
       <div class="ocr-result" id="ocrResult"></div>
     </div>
@@ -105,13 +109,24 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
     </div>
   </div>
 
-  <!-- 3: 摔倒检测 (占位) -->
+  <!-- 3: 摔倒检测 (Day 4) -->
   <div class="page">
     <div class="card">
-      <div class="card-icon">🤸</div>
+      <div class="card-icon"><svg width="48" height="48" viewBox="0 0 64 64" fill="none" stroke="#e89a5c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="23" cy="17" r="4"/><path d="M26 20 Q30 25 33 30"/><path d="M28 24 Q24 26 21 29"/><path d="M30 25 Q34 23 37 21"/><path d="M33 30 Q31 35 28 39"/><path d="M33 30 Q38 33 42 34"/><path d="M46 30 Q49 32 46 34"/><path d="M49 28 Q53 32 49 36"/></svg></div>
       <div class="page-title">摔倒检测</div>
       <div class="page-sub">时刻守护您的安全</div>
-      <div style="font-size:15px;color:#aaa">功能开发中...</div>
+      <div style="display:flex;align-items:center;gap:14px;margin:14px 0">
+        <div style="width:52px;height:30px;border-radius:15px;background:#4caf50;position:relative;cursor:pointer;transition:background .3s" id="fallSwitch" onclick="toggleFall()">
+          <div style="width:24px;height:24px;border-radius:50%;background:#fff;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,0.2)" id="fallKnob"></div>
+        </div>
+        <span id="fallStatus" style="font-size:20px;color:#4caf50;font-weight:600;transition:color .3s">已开启</span>
+      </div>
+      <div style="font-size:14px;color:#aaa;margin-bottom:10px">检测到摔倒自动通知紧急联系人</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <button onclick="startFallDetection()" style="padding:10px 22px;border:none;border-radius:12px;background:linear-gradient(135deg,#e89a5c,#d4823a);color:#fff;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 10px rgba(232,154,92,0.25)">📳 开始检测</button>
+        <button onclick="simulateFall()" style="padding:10px 22px;border:none;border-radius:12px;background:#fff;color:#e89a5c;font-size:15px;font-weight:500;cursor:pointer;border:2px solid #e89a5c">🎬 演示模式</button>
+      </div>
+      <div style="font-size:12px;color:#ccc;margin-top:6px">开始检测后，剧烈晃动手机可触发警报</div>
     </div>
   </div>
 </div>
@@ -235,6 +250,136 @@ async function checkScam() {
     showModal('⚠️ 检测失败，请重试');
   }
   loading.classList.remove('show');
+}
+
+// ===== Day 4: 摔倒检测 =====
+let fallTimer = null;
+let isAlerting = false;
+let motionWatch = null;
+let lastAccel = {x:0, y:0, z:0};
+let lastMotionTime = 0;
+
+function startFallDetection() {
+  if (typeof DeviceMotionEvent === 'undefined') {
+    showModal('⚠️ 此浏览器不支持传感器检测，请使用手机浏览器打开');
+    return;
+  }
+  // iOS需要请求权限
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission().then(state => {
+      if (state === 'granted') {
+        window.addEventListener('devicemotion', handleMotion);
+        showModal('✅ 摔倒检测已启动，正在监听您的动作');
+      }
+    }).catch(() => showModal('⚠️ 无法获取传感器权限'));
+  } else {
+    window.addEventListener('devicemotion', handleMotion);
+    showModal('✅ 摔倒检测已启动，正在监听您的动作');
+  }
+}
+
+function handleMotion(e) {
+  const acc = e.accelerationIncludingGravity;
+  if (!acc) return;
+  const now = Date.now();
+  // 计算加速度变化幅度
+  const delta = Math.abs(acc.x - lastAccel.x) + Math.abs(acc.y - lastAccel.y) + Math.abs(acc.z - lastAccel.z);
+  lastAccel = {x: acc.x, y: acc.y, z: acc.z};
+  // 阈值：剧烈冲击（摔倒通常瞬间加速度变化很大）
+  if (delta > 30 && (now - lastMotionTime) > 3000) {
+    lastMotionTime = now;
+    // 触发摔倒警报
+    if (!isAlerting && document.getElementById('fallSwitch').style.background !== '#ddd') {
+      triggerFallAlert();
+    }
+  }
+}
+
+function triggerFallAlert() {
+  isAlerting = true;
+  const st = document.getElementById('fallStatus');
+  const sw = document.getElementById('fallSwitch');
+  st.textContent = '🚨 检测到摔倒！';
+  st.style.color = '#c62828';
+  sw.style.background = '#c62828';
+  if (navigator.vibrate) { navigator.vibrate([500,200,500]); }
+  // 显示关闭警报按钮
+  let dismissBtn = document.getElementById('dismissBtn');
+  if (!dismissBtn) {
+    dismissBtn = document.createElement('button');
+    dismissBtn.id = 'dismissBtn';
+    dismissBtn.textContent = '✅ 我没事，关闭警报';
+    dismissBtn.style.cssText = 'padding:12px 24px;border:none;border-radius:14px;background:#fff;color:#c62828;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 3px 15px rgba(0,0,0,0.1);margin-top:8px;border:2px solid #c62828';
+    dismissBtn.onclick = dismissAlert;
+    document.querySelector('.page:nth-child(3) .card').appendChild(dismissBtn);
+  }
+  dismissBtn.style.display = 'block';
+  // 10秒后通知紧急联系人
+  fallTimer = setTimeout(() => {
+    showModal('⏰ 未收到确认，已自动通知紧急联系人！');
+    dismissAlert();
+  }, 10000);
+}
+
+function toggleFall() {
+  const sw = document.getElementById('fallSwitch');
+  const knob = document.getElementById('fallKnob');
+  const st = document.getElementById('fallStatus');
+  if (sw.style.background === '#ddd') {
+    sw.style.background = '#4caf50';
+    knob.style.right = '3px';
+    st.style.color = '#4caf50';
+    st.textContent = '已开启';
+  } else {
+    sw.style.background = '#ddd';
+    knob.style.right = '23px';
+    st.style.color = '#bbb';
+    st.textContent = '已关闭';
+  }
+}
+
+function simulateFall() {
+  if (isAlerting) return;
+  isAlerting = true;
+  const st = document.getElementById('fallStatus');
+  const sw = document.getElementById('fallSwitch');
+  st.textContent = '🚨 摔倒警报！请确认安全';
+  st.style.color = '#c62828';
+  sw.style.background = '#c62828';
+  if (navigator.vibrate) { navigator.vibrate([500,200,500]); }
+  // 显示关闭警报按钮
+  let dismissBtn = document.getElementById('dismissBtn');
+  if (!dismissBtn) {
+    dismissBtn = document.createElement('button');
+    dismissBtn.id = 'dismissBtn';
+    dismissBtn.textContent = '✅ 我没事，关闭警报';
+    dismissBtn.style.cssText = 'padding:12px 24px;border:none;border-radius:14px;background:#fff;color:#c62828;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 3px 15px rgba(0,0,0,0.1);margin-top:8px;border:2px solid #c62828';
+    dismissBtn.onclick = dismissAlert;
+    document.querySelector('.page:nth-child(3) .card').appendChild(dismissBtn);
+  }
+  dismissBtn.style.display = 'block';
+  // 10秒后通知紧急联系人
+  fallTimer = setTimeout(() => {
+    showModal('⏰ 未收到确认，已自动通知紧急联系人！');
+    dismissAlert();
+  }, 10000);
+}
+
+function dismissAlert() {
+  isAlerting = false;
+  if (fallTimer) { clearTimeout(fallTimer); fallTimer = null; }
+  const st = document.getElementById('fallStatus');
+  const sw = document.getElementById('fallSwitch');
+  const btn = document.getElementById('dismissBtn');
+  st.textContent = '已开启';
+  st.style.color = '#4caf50';
+  sw.style.background = '#4caf50';
+  if (btn) btn.style.display = 'none';
+}
+
+// ===== Day 4: 吃药提醒 =====
+function remindPill() {
+  showModal('💊 该吃药啦！记得按时吃药，身体才会好哦！');
 }
 
 // ===== 弹窗 =====
