@@ -54,6 +54,12 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
 .modal-text{font-size:18px;line-height:1.7;color:#333;white-space:pre-wrap}
 .modal-close{margin-top:16px;width:100%;padding:12px;border:none;border-radius:14px;background:linear-gradient(135deg,#e89a5c,#d4823a);color:#fff;font-size:18px;font-weight:600;cursor:pointer}
 .modal-voice{margin-top:8px;width:100%;padding:10px;border:2px solid #e89a5c;border-radius:14px;background:#fff;color:#e89a5c;font-size:16px;font-weight:600;cursor:pointer}
+/* Day 3: 防诈骗 */
+.input-area{width:100%;background:rgba(250,248,245,0.8);border-radius:16px;padding:14px 16px;border:1.5px solid rgba(0,0,0,0.05);transition:all .3s;margin-bottom:12px}
+.input-area:focus-within{border-color:#e89a5c;box-shadow:0 0 0 4px rgba(232,154,92,0.08)}
+.input-area input{width:100%;border:none;background:transparent;font-size:18px;outline:none;color:#2c2c2c}
+.check-btn{width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,#e89a5c,#d4823a);color:#fff;font-size:20px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(232,154,92,0.25);transition:all .2s}
+.check-btn:active{transform:scale(0.97)}
 </style>
 </head>
 <body>
@@ -84,13 +90,18 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
     </div>
   </div>
 
-  <!-- 2: 防诈骗 (占位) -->
+  <!-- 2: 防诈骗 (Day 3) -->
   <div class="page">
     <div class="card">
-      <div class="card-icon">🛡️</div>
+      <div class="card-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e89a5c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
       <div class="page-title">防诈骗</div>
       <div class="page-sub">查一下安不安全</div>
-      <div style="font-size:15px;color:#aaa">功能开发中...</div>
+      <div class="input-area">
+        <input type="text" id="scamInput" placeholder="输入号码或短信内容">
+      </div>
+      <button class="check-btn" onclick="checkScam()">🔍 检测</button>
+      <div class="ocr-loading" id="scamLoading">🔍 正在分析中...</div>
+      <div class="ocr-result" id="scamResult"></div>
     </div>
   </div>
 
@@ -191,6 +202,39 @@ function handlePhoto(input) {
     loading.classList.remove('show');
   };
   reader.readAsDataURL(file);
+}
+
+// ===== Day 3: 防诈骗检测 =====
+async function checkScam() {
+  const input = document.getElementById('scamInput').value.trim();
+  if (!input) {
+    showModal('请先输入电话号码或短信内容');
+    return;
+  }
+  const loading = document.getElementById('scamLoading');
+  loading.classList.add('show');
+  try {
+    const resp = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk-ws-H.EHPEXYH.gs4t.MEQCIHt2SfZZFPgQGxm3k-ef697w2ypJ_JXcDLrEuWNif40oAiA5svAShD-Zz8dCHLxyRVzkRtOXSMryNjHOOQHXVi55IA'
+      },
+      body: JSON.stringify({
+        model: 'qwen-plus',
+        messages: [{
+          role: 'user',
+          content: '我要你帮我判断一个电话或短信是否安全。内容如下："' + input + '"。请按以下规则回答：1.如果只是一串普通电话号码、或者内容是日常消息（快递、验证码、朋友问候等），就回答"安全"并简短说明。2.只有当内容明显涉及索要钱财、转账、中奖交钱、冒充公检法、验证码、账号密码等诈骗特征时，才判断为"诈骗"。3.回答用最通俗的话，像对80岁老人解释：先给结论（安全/诈骗），再简短说明原因和怎么做。总字数60字以内，语气亲切。不要夸大，不要把所有号码都当诈骗。'
+        }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.choices?.[0]?.message?.content || '无法判断，请咨询家人';
+    showModal(text);
+  } catch(err) {
+    showModal('⚠️ 检测失败，请重试');
+  }
+  loading.classList.remove('show');
 }
 
 // ===== 弹窗 =====
