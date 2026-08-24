@@ -95,10 +95,7 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
       </button>
       <input type="file" id="fileInput" accept="image/*" onchange="handlePhoto(this)">
       <span class="tag" data-i18n="p1tag">药品识别 · 生活助手</span>
-      <div style="display:flex;align-items:center;gap:6px;background:rgba(232,154,92,0.08);border-radius:20px;padding:4px 14px;margin-top:10px;font-size:14px;color:#e89a5c;font-weight:500">
-        <span>💊</span><span data-i18n="pill">下次吃药</span><span id="pillTime">20:00</span>
-        <button onclick="remindPill()" data-i18n="remindBtn" style="margin-left:6px;padding:2px 10px;border:none;border-radius:10px;background:#e89a5c;color:#fff;font-size:12px;cursor:pointer">提醒</button>
-      </div>
+
       <div class="ocr-loading" id="ocrLoading">🔍 正在识别中...</div>
       <div class="ocr-result" id="ocrResult"></div>
     </div>
@@ -139,6 +136,29 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
       <div data-i18n="shakeHint" style="font-size:12px;color:#ccc;margin-top:6px">开始检测后，剧烈晃动手机可触发警报</div>
     </div>
   </div>
+  <!-- 4: 药库 (Day 5) -->
+  <div class="page">
+    <div class="card" style="padding:24px">
+      <div class="card-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e89a5c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M8 5v14"/><path d="M12 5v14"/><path d="M16 5v14"/></svg></div>
+      <div class="page-title" data-i18n="p4t">药库</div>
+      <div class="page-sub" data-i18n="p4s">管理您的药品和用药计划</div>
+      <div id="medList" style="width:100%;margin-bottom:10px"></div>
+      <div style="width:100%;margin-bottom:8px">
+        <input type="text" id="medName" placeholder="药品名称" data-i18n-placeholder="medNamePh" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;font-size:15px;outline:none;box-sizing:border-box">
+      </div>
+      <div style="width:100%;margin-bottom:8px">
+        <input type="text" id="medDose" placeholder="用量(如:1片)" data-i18n-placeholder="medDosePh" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;font-size:15px;outline:none;box-sizing:border-box">
+      </div>
+      <div style="width:100%;margin-bottom:10px">
+        <input type="time" id="medTime" value="08:00" style="width:100%;padding:10px;border:2px solid #eee;border-radius:10px;font-size:15px;outline:none;box-sizing:border-box">
+      </div>
+      <div style="width:100%;margin-bottom:10px">
+        <button onclick="addMed()" data-i18n="addMed" style="width:100%;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#e89a5c,#d4823a);color:#fff;font-size:15px;font-weight:600;cursor:pointer">➕ 添加药品</button>
+      </div>
+      <div style="width:100%;font-size:13px;color:#aaa" data-i18n="medHint">添加药品后自动生成用药时间表</div>
+    </div>
+  </div>
+</div>
 </div>
 
 <button class="settings-btn" onclick="toggleSettings()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -151,12 +171,13 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
   <div class="dot active"></div>
   <div class="dot"></div>
   <div class="dot"></div>
+  <div class="dot"></div>
 </div>
 
 <!-- OCR结果弹窗 -->
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal-box">
-    <div class="modal-title">📋 识别结果</div>
+    <div class="modal-title" data-i18n="resultTitle">📋 识别结果</div>
     <div class="modal-text" id="modalText"></div>
     <button class="modal-voice" onclick="speakModal()" data-i18n="listenAgain">🔊 再听一遍</button>
     <button class="modal-close" onclick="closeModal()" data-i18n="gotIt">知道了</button>
@@ -368,12 +389,12 @@ function toggleFall() {
     sw.style.background = '#4caf50';
     knob.style.right = '3px';
     st.style.color = '#4caf50';
-    st.textContent = '已开启';
+    st.textContent = L('已开启','ON','ACTIVADO','ACTIVÉ','ВКЛ','مفعّل');
   } else {
     sw.style.background = '#ddd';
     knob.style.right = '23px';
     st.style.color = '#bbb';
-    st.textContent = '已关闭';
+    st.textContent = L('已关闭','OFF','APAGADO','DÉSACTIVÉ','ВЫКЛ','متوقف');
   }
 }
 
@@ -411,7 +432,7 @@ function dismissAlert() {
   const st = document.getElementById('fallStatus');
   const sw = document.getElementById('fallSwitch');
   const btn = document.getElementById('dismissBtn');
-  st.textContent = '已开启';
+  st.textContent = L('已开启','ON','ACTIVADO','ACTIVÉ','ВКЛ','مفعّل');
   st.style.color = '#4caf50';
   sw.style.background = '#4caf50';
   if (btn) btn.style.display = 'none';
@@ -421,6 +442,69 @@ function dismissAlert() {
 function remindPill() {
   showModal(L('💊 该吃药啦！记得按时吃药，身体才会好哦！','💊 Time to take your medicine!','💊 ¡Hora de tomar su medicina!','💊 Heure de prendre vos médicaments!','💊 Время принимать лекарство!','💊 حان وقت تناول الدواء!'));
 }
+
+// ===== Day 5: 药库管理 =====
+let meds = JSON.parse(localStorage.getItem('qinan_meds') || '[]');
+
+function renderMeds() {
+  const list = document.getElementById('medList');
+  if (!list) return;
+  if (meds.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:#bbb;font-size:14px" data-i18n="emptyMeds">📭 还没有药品，添加第一种吧</div>';
+  } else {
+    meds.sort((a, b) => a.time.localeCompare(b.time));
+    list.innerHTML = meds.map((m, i) =>
+      '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#faf8f5;border-radius:10px;margin-bottom:6px;border:1px solid #eee">' +
+      '<span style="font-size:16px">💊</span>' +
+      '<div style="flex:1;text-align:left">' +
+      '<div style="font-size:15px;font-weight:600;color:#333">' + m.name + '</div>' +
+      '<div style="font-size:13px;color:#888">' + m.dose + ' · ' + L('每天 ','daily ','diario ','chaque jour ','ежедневно ','يوميًا ') + m.time + '</div>' +
+      '</div>' +
+      '<button onclick="delMed(' + i + ')" style="border:none;background:#fbe9e7;color:#c62828;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer">' + L('删除','Delete','Eliminar','Supprimer','Удалить','حذف') + '</button>' +
+      '</div>'
+    ).join('');
+  }
+}
+
+function addMed() {
+  const name = document.getElementById('medName').value.trim();
+  const dose = document.getElementById('medDose').value.trim() || '1片';
+  const time = document.getElementById('medTime').value || '08:00';
+  if (!name) {
+    showModal(L('请输入药品名称','Please enter medicine name','Ingrese el nombre','Entrez le nom','Введите название','أدخل الاسم'));
+    return;
+  }
+  meds.push({ name, dose, time });
+  localStorage.setItem('qinan_meds', JSON.stringify(meds));
+  document.getElementById('medName').value = '';
+  document.getElementById('medDose').value = '';
+  renderMeds();
+  showModal(L('已添加：' + name + '，每天' + time + '服用','Added: ' + name + ', daily at ' + time,'Añadido','Ajouté','Добавлено','تمت الإضافة'));
+  checkMeds();
+}
+
+function delMed(i) {
+  meds.splice(i, 1);
+  localStorage.setItem('qinan_meds', JSON.stringify(meds));
+  renderMeds();
+}
+
+function checkMeds() {
+  const now = new Date();
+  const hm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const due = meds.filter(m => m.time <= hm);
+  if (due.length > 0) {
+    const names = due.map(m => m.name + ' ' + m.dose).join('、');
+    const msg = L('💊 该吃药啦：' + names + '。记得按时吃药哦！','💊 Time to take: ' + names + '. Remember to take your medicine!','💊 Hora de tomar','💊 Heure de prendre','💊 Время принимать','💊 حان وقت تناول');
+    setTimeout(() => showModal(msg), 2000);
+  }
+}
+
+// 页面打开时自动检查
+window.addEventListener('load', () => {
+  renderMeds();
+  setTimeout(checkMeds, 3000);
+});
 
 // ===== 弹窗 =====
 
@@ -477,7 +561,7 @@ const i18nDict = {
     fallDesc: '检测到摔倒自动通知紧急联系人',
     startDetect: '📳 开始检测', demoMode: '🎬 演示模式',
     shakeHint: '开始检测后，剧烈晃动手机可触发警报',
-    settings: '设置', fontSize: '🔤 字体大小', language: '🌐 语言', remindBtn: '提醒', listenAgain: '🔊 再听一遍', gotIt: '知道了', checkBtn: '🔍 检测', takePhoto: '拍照'
+    settings: '设置', fontSize: '🔤 字体大小', language: '🌐 语言', remindBtn: '提醒', listenAgain: '🔊 再听一遍', gotIt: '知道了', checkBtn: '🔍 检测', takePhoto: '拍照', medNamePh: '药品名称', medDosePh: '用量(如:1片)', recognizing: '🔍 正在识别中...', analyzing: '🔍 正在分析中...', resultTitle: '📋 识别结果', p4t: '药库', p4s: '管理您的药品和用药计划', addMed: '➕ 添加药品', medHint: '添加药品后自动生成用药时间表', emptyMeds: '📭 还没有药品，添加第一种吧'
   },
   en: {
     p1t: 'Scan Medicine', p1s: 'Take a photo, AI reads it aloud', p1tag: 'Medicine ID · Life Assistant',
@@ -487,7 +571,7 @@ const i18nDict = {
     fallDesc: 'Auto-notify emergency contacts when a fall is detected',
     startDetect: '📳 Start Detection', demoMode: '🎬 Demo Mode',
     shakeHint: 'Shake your phone hard to trigger the alarm',
-    settings: 'Settings', fontSize: '🔤 Font Size', language: '🌐 Language', remindBtn: 'Remind', listenAgain: '🔊 Listen again', gotIt: 'Got it', checkBtn: '🔍 Check', takePhoto: 'Take Photo'
+    settings: 'Settings', fontSize: '🔤 Font Size', language: '🌐 Language', remindBtn: 'Remind', listenAgain: '🔊 Listen again', gotIt: 'Got it', checkBtn: '🔍 Check', takePhoto: 'Take Photo', medNamePh: 'Medicine name', medDosePh: 'Dose (e.g. 1 pill)', recognizing: '🔍 Recognizing...', analyzing: '🔍 Analyzing...', resultTitle: '📋 Result', p4t: 'Medicine Cabinet', p4s: 'Manage your medicines and schedule', addMed: '➕ Add Medicine', medHint: 'Schedule auto-generates after adding', emptyMeds: '📭 No medicines yet, add your first one'
   },
   es: {
     p1t: 'Escanear Medicina', p1s: 'Tome una foto, la IA la lee', p1tag: 'Identificación de Medicamentos',
@@ -497,7 +581,7 @@ const i18nDict = {
     fallDesc: 'Notifica a contactos de emergencia al detectar una caída',
     startDetect: '📳 Iniciar Detección', demoMode: '🎬 Modo Demo',
     shakeHint: 'Agite el teléfono para activar la alarma',
-    settings: 'Ajustes', fontSize: '🔤 Tamaño de Letra', language: '🌐 Idioma', remindBtn: 'Recordar', listenAgain: '🔊 Escuchar de nuevo', gotIt: 'Entendido', checkBtn: '🔍 Verificar', takePhoto: 'Tomar Foto'
+    settings: 'Ajustes', fontSize: '🔤 Tamaño de Letra', language: '🌐 Idioma', remindBtn: 'Recordar', listenAgain: '🔊 Escuchar de nuevo', gotIt: 'Entendido', checkBtn: '🔍 Verificar', takePhoto: 'Tomar Foto', medNamePh: 'Nombre del medicamento', medDosePh: 'Dosis (ej: 1 pastilla)', recognizing: '🔍 Reconociendo...', analyzing: '🔍 Analizando...', resultTitle: '📋 Resultado', p4t: 'Botiquín', p4s: 'Gestione sus medicamentos', addMed: '➕ Añadir', medHint: 'El horario se genera automáticamente', emptyMeds: '📭 Sin medicamentos'
   },
   fr: {
     p1t: 'Scanner Médicament', p1s: 'Prenez une photo, la IA la lit', p1tag: 'Identification de Médicament',
@@ -507,7 +591,7 @@ const i18nDict = {
     fallDesc: 'Prévient les contacts de secours en cas de chute',
     startDetect: '📳 Démarrer', demoMode: '🎬 Mode Démo',
     shakeHint: 'Secouez le téléphone pour activer',
-    settings: 'Réglages', fontSize: '🔤 Taille de Police', language: '🌐 Langue', remindBtn: 'Rappeler', listenAgain: '🔊 Réécouter', gotIt: 'Compris', checkBtn: '🔍 Vérifier', takePhoto: 'Prendre Photo'
+    settings: 'Réglages', fontSize: '🔤 Taille de Police', language: '🌐 Langue', remindBtn: 'Rappeler', listenAgain: '🔊 Réécouter', gotIt: 'Compris', checkBtn: '🔍 Vérifier', takePhoto: 'Prendre Photo', medNamePh: 'Nom du médicament', medDosePh: 'Dose (ex: 1 comprimé)', recognizing: '🔍 Reconnaissance...', analyzing: '🔍 Analyse...', resultTitle: '📋 Résultat', p4t: 'Armoire à Médicaments', p4s: 'Gérez vos médicaments', addMed: '➕ Ajouter', medHint: 'Horaire généré automatiquement', emptyMeds: '📭 Aucun médicament'
   },
   ru: {
     p1t: 'Сканировать Лекарство', p1s: 'Сфотографируйте, ИИ прочитает', p1tag: 'Определение Лекарства',
@@ -517,7 +601,7 @@ const i18nDict = {
     fallDesc: 'Уведомляет контакты при падении',
     startDetect: '📳 Начать', demoMode: '🎬 Демо-режим',
     shakeHint: 'Потрясите телефон для тревоги',
-    settings: 'Настройки', fontSize: '🔤 Размер Шрифта', language: '🌐 Язык', remindBtn: 'Напомнить', listenAgain: '🔊 Слушать ещё раз', gotIt: 'Понятно', checkBtn: '🔍 Проверить', takePhoto: 'Сфотографировать'
+    settings: 'Настройки', fontSize: '🔤 Размер Шрифта', language: '🌐 Язык', remindBtn: 'Напомнить', listenAgain: '🔊 Слушать ещё раз', gotIt: 'Понятно', checkBtn: '🔍 Проверить', takePhoto: 'Сфотографировать', medNamePh: 'Название лекарства', medDosePh: 'Доза (напр: 1 таблетка)', recognizing: '🔍 Распознавание...', analyzing: '🔍 Анализ...', resultTitle: '📋 Результат', p4t: 'Аптечка', p4s: 'Управляйте лекарствами', addMed: '➕ Добавить', medHint: 'Расписание создаётся автоматически', emptyMeds: '📭 Нет лекарств'
   },
   ar: {
     p1t: 'مسح الدواء', p1s: 'التقط صورة وسيقرأها الذكاء الاصطناعي', p1tag: 'تحديد الدواء',
@@ -527,7 +611,7 @@ const i18nDict = {
     fallDesc: 'إخطار جهات الاتصال عند السقوط',
     startDetect: '📳 بدء الكشف', demoMode: '🎬 وضع العرض',
     shakeHint: 'هز الهاتف لتفعيل التنبيه',
-    settings: 'الإعدادات', fontSize: '🔤 حجم الخط', language: '🌐 اللغة', remindBtn: 'تذكير', listenAgain: '🔊 إعادة الاستماع', gotIt: 'حسنا', checkBtn: '🔍 تحقق', takePhoto: 'التقاط صورة'
+    settings: 'الإعدادات', fontSize: '🔤 حجم الخط', language: '🌐 اللغة', remindBtn: 'تذكير', listenAgain: '🔊 إعادة الاستماع', gotIt: 'حسنا', checkBtn: '🔍 تحقق', takePhoto: 'التقاط صورة', medNamePh: 'اسم الدواء', medDosePh: 'الجرعة (مثل: قرص واحد)', recognizing: '🔍 جار التعرف...', analyzing: '🔍 جار التحليل...', resultTitle: '📋 النتيجة', p4t: 'خزانة الأدوية', p4s: 'إدارة أدويتك', addMed: '➕ إضافة', medHint: 'يتم إنشاء الجدول تلقائيًا', emptyMeds: '📭 لا توجد أدوية'
   }
 };
 
