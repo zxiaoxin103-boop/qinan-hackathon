@@ -128,12 +128,12 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
         </div>
         <span id="fallStatus" data-i18n="fallOn" style="font-size:20px;color:#4caf50;font-weight:600;transition:color .3s">已开启</span>
       </div>
-      <div data-i18n="fallDesc" style="font-size:14px;color:#aaa;margin-bottom:10px">检测到摔倒自动通知紧急联系人</div>
+      <div data-i18n="fallDesc" style="font-size:14px;color:#aaa;margin-bottom:10px">Prototype: 晃动手机模拟摔倒触发警报<br>Future App: 自动检测摔倒并通知紧急联系人</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
         <button onclick="startFallDetection()" data-i18n="startDetect" style="padding:10px 22px;border:none;border-radius:12px;background:linear-gradient(135deg,#e89a5c,#d4823a);color:#fff;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 10px rgba(232,154,92,0.25)">📳 开始检测</button>
         <button onclick="simulateFall()" data-i18n="demoMode" style="padding:10px 22px;border:none;border-radius:12px;background:#fff;color:#e89a5c;font-size:15px;font-weight:500;cursor:pointer;border:2px solid #e89a5c">🎬 演示模式</button>
       </div>
-      <div data-i18n="shakeHint" style="font-size:12px;color:#ccc;margin-top:6px">开始检测后，剧烈晃动手机可触发警报</div>
+      <div data-i18n="shakeHint" style="font-size:12px;color:#ccc;margin-top:6px">Prototype: shake phone to simulate fall</div>
     </div>
   </div>
   <!-- 4: 药库 (Day 5) -->
@@ -611,9 +611,10 @@ const i18nDict = {
     pill: 'Next pill', p2t: 'Scam Guard', p2s: 'Check if it is safe',
     scamPh: 'Enter number or SMS text', p3t: 'Fall Detection', p3s: 'Always protecting you',
     fallOn: 'ON', fallOff: 'OFF',
-    fallDesc: 'Auto-notify emergency contacts when a fall is detected',
+    fallDesc: 'Prototype: shake to simulate a fall and trigger alert
+Future App: automatic detection with motion sensors',
     startDetect: '📳 Start Detection', demoMode: '🎬 Demo Mode',
-    shakeHint: 'Shake your phone hard to trigger the alarm',
+    shakeHint: 'Prototype: shake phone to simulate fall',
     settings: 'Settings', fontSize: '🔤 Font Size', language: '🌐 Language', remindBtn: 'Remind', listenAgain: '🔊 Listen again', gotIt: 'Got it', checkBtn: '🔍 Check', takePhoto: 'Take Photo', medNamePh: 'Medicine name', medDosePh: 'Dose (e.g. 1 pill)', recognizing: '🔍 Recognizing...', analyzing: '🔍 Analyzing...', resultTitle: '📋 Result', p4t: 'Medicine Cabinet', p4s: 'Manage your medicines and schedule', addMed: '➕ Add Medicine', medHint: 'Schedule auto-generates after adding', emptyMeds: '📭 No medicines yet, add your first one'
   },
   es: {
