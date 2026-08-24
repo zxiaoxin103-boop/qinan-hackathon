@@ -191,9 +191,9 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
   <div class="setting-group">
     <label data-i18n="fontSize">🔤 字体大小</label>
     <div class="opt-group" id="sizeGroup">
-      <button data-v="s">小</button>
-      <button data-v="m" class="active">中</button>
-      <button data-v="l">大</button>
+      <button data-v="s" data-i18n="sizeS">小</button>
+      <button data-v="m" class="active" data-i18n="sizeM">中</button>
+      <button data-v="l" data-i18n="sizeL">大</button>
     </div>
   </div>
   <div class="setting-group">
@@ -630,7 +630,7 @@ const i18nDict = {
     fallDesc: '检测到摔倒自动通知紧急联系人',
     startDetect: '📳 开始检测', demoMode: '🎬 演示模式',
     shakeHint: '开始检测后，剧烈晃动手机可触发警报',
-    settings: '设置', fontSize: '🔤 字体大小', language: '🌐 语言', remindBtn: '提醒', listenAgain: '🔊 再听一遍', gotIt: '知道了', checkBtn: '🔍 检测', takePhoto: '拍照', medNamePh: '药品名称', medDosePh: '用量(如:1片)', recognizing: '🔍 正在识别中...', analyzing: '🔍 正在分析中...', resultTitle: '📋 识别结果', p4t: '药库', p4s: '管理您的药品和用药计划', addMed: '➕ 添加药品', medHint: '添加药品后自动生成用药时间表', emptyMeds: '📭 还没有药品，添加第一种吧'
+    settings: '设置', fontSize: '🔤 字体大小', language: '🌐 语言', remindBtn: '提醒', listenAgain: '🔊 再听一遍', gotIt: '知道了', checkBtn: '🔍 检测', takePhoto: '拍照', medNamePh: '药品名称', medDosePh: '用量(如:1片)', sizeS: '小', sizeM: '中', sizeL: '大', recognizing: '🔍 正在识别中...', analyzing: '🔍 正在分析中...', resultTitle: '📋 识别结果', p4t: '药库', p4s: '管理您的药品和用药计划', addMed: '➕ 添加药品', medHint: '添加药品后自动生成用药时间表', emptyMeds: '📭 还没有药品，添加第一种吧'
   },
   en: {
     p1t: 'Scan Medicine', p1s: 'AI identifies the medicine and reads it aloud', p1tag: 'Medicine ID · Life Assistant',
@@ -640,7 +640,7 @@ const i18nDict = {
     fallDesc: 'Prototype: Shake your phone to simulate a fall. Future App: Automatically detect falls and notify emergency contacts.',
     startDetect: '📳 Start Detection', demoMode: '🎬 Demo Mode',
     shakeHint: 'Prototype: Shake your phone to simulate a fall.',
-    settings: 'Settings', fontSize: '🔤 Font Size', language: '🌐 Language', remindBtn: 'Remind', listenAgain: '🔊 Listen again', gotIt: 'Got it', checkBtn: '🔍 Check', takePhoto: 'Take Photo', medNamePh: 'Medicine name', medDosePh: 'Dose (e.g. 1 pill)', recognizing: '🔍 Recognizing...', analyzing: '🔍 Analyzing...', resultTitle: '📋 Result', p4t: 'Medicine Cabinet', p4s: 'Manage your medicines and schedule', addMed: '➕ Add Medicine', medHint: 'Schedule auto-generates after adding', emptyMeds: '📭 No medicines yet, add your first one'
+    settings: 'Settings', fontSize: '🔤 Font Size', language: '🌐 Language', remindBtn: 'Remind', listenAgain: '🔊 Listen again', gotIt: 'Got it', checkBtn: '🔍 Check', takePhoto: 'Take Photo', medNamePh: 'Medicine name', medDosePh: 'Dose (e.g. 1 pill)', sizeS: 'S', sizeM: 'M', sizeL: 'L', recognizing: '🔍 Recognizing...', analyzing: '🔍 Analyzing...', resultTitle: '📋 Result', p4t: 'Medicine Cabinet', p4s: 'Manage your medicines and schedule', addMed: '➕ Add Medicine', medHint: 'Schedule auto-generates after adding', emptyMeds: '📭 No medicines yet, add your first one'
   },
   es: {
     p1t: 'Escanear Medicina', p1s: 'La IA identifica y lee la información', p1tag: 'Identificación de Medicamentos',
@@ -650,7 +650,7 @@ const i18nDict = {
     fallDesc: 'Notifica a contactos de emergencia al detectar una caída',
     startDetect: '📳 Iniciar Detección', demoMode: '🎬 Modo Demo',
     shakeHint: 'Agite el teléfono para activar la alarma',
-    settings: 'Ajustes', fontSize: '🔤 Tamaño de Letra', language: '🌐 Idioma', remindBtn: 'Recordar', listenAgain: '🔊 Escuchar de nuevo', gotIt: 'Entendido', checkBtn: '🔍 Verificar', takePhoto: 'Tomar Foto', medNamePh: 'Nombre del medicamento', medDosePh: 'Dosis (ej: 1 pastilla)', recognizing: '🔍 Reconociendo...', analyzing: '🔍 Analizando...', resultTitle: '📋 Resultado', p4t: 'Botiquín', p4s: 'Gestione sus medicamentos', addMed: '➕ Añadir', medHint: 'El horario se genera automáticamente', emptyMeds: '📭 Sin medicamentos'
+    settings: 'Ajustes', fontSize: '🔤 Tamaño de Letra', language: '🌐 Idioma', remindBtn: 'Recordar', listenAgain: '🔊 Escuchar de nuevo', gotIt: 'Entendido', checkBtn: '🔍 Verificar', takePhoto: 'Tomar Foto', medNamePh: 'Nombre del medicamento', medDosePh: 'Dosis (ej: 1 pastilla)', sizeS: 'P', sizeM: 'M', sizeL: 'G', recognizing: '🔍 Reconociendo...', analyzing: '🔍 Analizando...', resultTitle: '📋 Resultado', p4t: 'Botiquín', p4s: 'Gestione sus medicamentos', addMed: '➕ Añadir', medHint: 'El horario se genera automáticamente', emptyMeds: '📭 Sin medicamentos'
   },
   fr: {
     p1t: 'Scanner Médicament', p1s: 'La IA identifie et lit les informations', p1tag: 'Identification de Médicament',
@@ -660,7 +660,7 @@ const i18nDict = {
     fallDesc: 'Prévient les contacts de secours en cas de chute',
     startDetect: '📳 Démarrer', demoMode: '🎬 Mode Démo',
     shakeHint: 'Secouez le téléphone pour activer',
-    settings: 'Réglages', fontSize: '🔤 Taille de Police', language: '🌐 Langue', remindBtn: 'Rappeler', listenAgain: '🔊 Réécouter', gotIt: 'Compris', checkBtn: '🔍 Vérifier', takePhoto: 'Prendre Photo', medNamePh: 'Nom du médicament', medDosePh: 'Dose (ex: 1 comprimé)', recognizing: '🔍 Reconnaissance...', analyzing: '🔍 Analyse...', resultTitle: '📋 Résultat', p4t: 'Armoire à Médicaments', p4s: 'Gérez vos médicaments', addMed: '➕ Ajouter', medHint: 'Horaire généré automatiquement', emptyMeds: '📭 Aucun médicament'
+    settings: 'Réglages', fontSize: '🔤 Taille de Police', language: '🌐 Langue', remindBtn: 'Rappeler', listenAgain: '🔊 Réécouter', gotIt: 'Compris', checkBtn: '🔍 Vérifier', takePhoto: 'Prendre Photo', medNamePh: 'Nom du médicament', medDosePh: 'Dose (ex: 1 comprimé)', sizeS: 'P', sizeM: 'M', sizeL: 'G', recognizing: '🔍 Reconnaissance...', analyzing: '🔍 Analyse...', resultTitle: '📋 Résultat', p4t: 'Armoire à Médicaments', p4s: 'Gérez vos médicaments', addMed: '➕ Ajouter', medHint: 'Horaire généré automatiquement', emptyMeds: '📭 Aucun médicament'
   },
   ru: {
     p1t: 'Сканировать Лекарство', p1s: 'ИИ определяет и читает информацию', p1tag: 'Определение Лекарства',
@@ -670,7 +670,7 @@ const i18nDict = {
     fallDesc: 'Уведомляет контакты при падении',
     startDetect: '📳 Начать', demoMode: '🎬 Демо-режим',
     shakeHint: 'Потрясите телефон для тревоги',
-    settings: 'Настройки', fontSize: '🔤 Размер Шрифта', language: '🌐 Язык', remindBtn: 'Напомнить', listenAgain: '🔊 Слушать ещё раз', gotIt: 'Понятно', checkBtn: '🔍 Проверить', takePhoto: 'Сфотографировать', medNamePh: 'Название лекарства', medDosePh: 'Доза (напр: 1 таблетка)', recognizing: '🔍 Распознавание...', analyzing: '🔍 Анализ...', resultTitle: '📋 Результат', p4t: 'Аптечка', p4s: 'Управляйте лекарствами', addMed: '➕ Добавить', medHint: 'Расписание создаётся автоматически', emptyMeds: '📭 Нет лекарств'
+    settings: 'Настройки', fontSize: '🔤 Размер Шрифта', language: '🌐 Язык', remindBtn: 'Напомнить', listenAgain: '🔊 Слушать ещё раз', gotIt: 'Понятно', checkBtn: '🔍 Проверить', takePhoto: 'Сфотографировать', medNamePh: 'Название лекарства', medDosePh: 'Доза (напр: 1 таблетка)', sizeS: 'М', sizeM: 'С', sizeL: 'Б', recognizing: '🔍 Распознавание...', analyzing: '🔍 Анализ...', resultTitle: '📋 Результат', p4t: 'Аптечка', p4s: 'Управляйте лекарствами', addMed: '➕ Добавить', medHint: 'Расписание создаётся автоматически', emptyMeds: '📭 Нет лекарств'
   },
   ar: {
     p1t: 'مسح الدواء', p1s: 'الذكاء الاصطناعي يحدد ويقرأ المعلومات', p1tag: 'تحديد الدواء',
@@ -680,7 +680,7 @@ const i18nDict = {
     fallDesc: 'إخطار جهات الاتصال عند السقوط',
     startDetect: '📳 بدء الكشف', demoMode: '🎬 وضع العرض',
     shakeHint: 'هز الهاتف لتفعيل التنبيه',
-    settings: 'الإعدادات', fontSize: '🔤 حجم الخط', language: '🌐 اللغة', remindBtn: 'تذكير', listenAgain: '🔊 إعادة الاستماع', gotIt: 'حسنا', checkBtn: '🔍 تحقق', takePhoto: 'التقاط صورة', medNamePh: 'اسم الدواء', medDosePh: 'الجرعة (مثل: قرص واحد)', recognizing: '🔍 جار التعرف...', analyzing: '🔍 جار التحليل...', resultTitle: '📋 النتيجة', p4t: 'خزانة الأدوية', p4s: 'إدارة أدويتك', addMed: '➕ إضافة', medHint: 'يتم إنشاء الجدول تلقائيًا', emptyMeds: '📭 لا توجد أدوية'
+    settings: 'الإعدادات', fontSize: '🔤 حجم الخط', language: '🌐 اللغة', remindBtn: 'تذكير', listenAgain: '🔊 إعادة الاستماع', gotIt: 'حسنا', checkBtn: '🔍 تحقق', takePhoto: 'التقاط صورة', medNamePh: 'اسم الدواء', medDosePh: 'الجرعة (مثل: قرص واحد)', sizeS: 'صغير', sizeM: 'متوسط', sizeL: 'كبير', recognizing: '🔍 جار التعرف...', analyzing: '🔍 جار التحليل...', resultTitle: '📋 النتيجة', p4t: 'خزانة الأدوية', p4s: 'إدارة أدويتك', addMed: '➕ إضافة', medHint: 'يتم إنشاء الجدول تلقائيًا', emptyMeds: '📭 لا توجد أدوية'
   }
 };
 
