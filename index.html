@@ -537,16 +537,16 @@ function applyLang(lang) {
   const dict = i18nDict[lang];
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (dict[key]) el.textContent = dict[key];
+    if (dict[key] && el.id !== 'dismissBtn') el.textContent = dict[key];
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
     if (dict[key]) el.placeholder = dict[key];
   });
-  // 动态按钮（我没事）
-  const dismissBtn = document.getElementById('dismissBtn');
-  if (dismissBtn && dismissBtn.style.display !== 'none') {
-    dismissBtn.textContent = L('✅ 我没事，关闭警报','✅ I am fine, dismiss','✅ Estoy bien','✅ Je vais bien','✅ Я в порядке','✅ أنا بخير');
+  // 动态按钮（我没事）- 无条件更新
+  const dismissBtn2 = document.getElementById('dismissBtn');
+  if (dismissBtn2) {
+    dismissBtn2.textContent = L('✅ 我没事，关闭警报','✅ I am fine, dismiss','✅ Estoy bien','✅ Je vais bien','✅ Я в порядке','✅ أنا بخير');
   }
   // 摔倒状态文字（6语言）
   const st = document.getElementById('fallStatus');
