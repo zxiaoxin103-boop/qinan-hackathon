@@ -60,6 +60,16 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
 .input-area input{width:100%;border:none;background:transparent;font-size:18px;outline:none;color:#2c2c2c}
 .check-btn{width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,#e89a5c,#d4823a);color:#fff;font-size:20px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(232,154,92,0.25);transition:all .2s}
 .check-btn:active{transform:scale(0.97)}
+
+.settings-panel{position:fixed;top:0;right:-100%;width:100%;height:100%;background:rgba(255,255,255,0.95);z-index:200;transition:right .35s ease;padding:80px 28px 30px}
+.settings-panel.open{right:0}
+.settings-panel h2{font-size:24px;color:#2c2c2c;margin-bottom:24px}
+.close-settings{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;border:none;background:#f5f0e8;font-size:20px;cursor:pointer;color:#999;display:flex;align-items:center;justify-content:center}
+.setting-group{margin-bottom:24px}
+.setting-group label{font-size:16px;color:#666;display:block;margin-bottom:10px}
+.opt-group{display:flex;gap:10px}
+.opt-group button{flex:1;padding:12px;border:2px solid #eee;border-radius:10px;background:#faf8f5;font-size:15px;cursor:pointer;transition:all .2s;color:#666}
+.opt-group button.active{border-color:#e89a5c;background:#fdf0e4;color:#e89a5c;font-weight:600}
 </style>
 </head>
 <body>
@@ -78,16 +88,16 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
   <div class="page">
     <div class="card">
       <div class="card-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e89a5c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-      <div class="page-title">拍药盒</div>
-      <div class="page-sub">拍一拍，自动读出来</div>
+      <div class="page-title" data-i18n="p1t">拍药盒</div>
+      <div class="page-sub" data-i18n="p1s">拍一拍，自动读出来</div>
       <button class="main-btn" onclick="document.getElementById('fileInput').click()">
-        <span class="icon"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>拍照
+        <span class="icon"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span><span data-i18n="takePhoto">拍照</span>
       </button>
       <input type="file" id="fileInput" accept="image/*" onchange="handlePhoto(this)">
-      <span class="tag">药品识别 · 生活助手</span>
+      <span class="tag" data-i18n="p1tag">药品识别 · 生活助手</span>
       <div style="display:flex;align-items:center;gap:6px;background:rgba(232,154,92,0.08);border-radius:20px;padding:4px 14px;margin-top:10px;font-size:14px;color:#e89a5c;font-weight:500">
-        <span>💊</span><span>下次吃药</span><span id="pillTime">20:00</span>
-        <button onclick="remindPill()" style="margin-left:6px;padding:2px 10px;border:none;border-radius:10px;background:#e89a5c;color:#fff;font-size:12px;cursor:pointer">提醒</button>
+        <span>💊</span><span data-i18n="pill">下次吃药</span><span id="pillTime">20:00</span>
+        <button onclick="remindPill()" data-i18n="remindBtn" style="margin-left:6px;padding:2px 10px;border:none;border-radius:10px;background:#e89a5c;color:#fff;font-size:12px;cursor:pointer">提醒</button>
       </div>
       <div class="ocr-loading" id="ocrLoading">🔍 正在识别中...</div>
       <div class="ocr-result" id="ocrResult"></div>
@@ -98,12 +108,12 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
   <div class="page">
     <div class="card">
       <div class="card-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e89a5c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
-      <div class="page-title">防诈骗</div>
-      <div class="page-sub">查一下安不安全</div>
+      <div class="page-title" data-i18n="p2t">防诈骗</div>
+      <div class="page-sub" data-i18n="p2s">查一下安不安全</div>
       <div class="input-area">
-        <input type="text" id="scamInput" placeholder="输入号码或短信内容">
+        <input type="text" id="scamInput" placeholder="输入号码或短信内容" data-i18n-placeholder="scamPh">
       </div>
-      <button class="check-btn" onclick="checkScam()">🔍 检测</button>
+      <button class="check-btn" onclick="checkScam()" data-i18n="checkBtn">🔍 检测</button>
       <div class="ocr-loading" id="scamLoading">🔍 正在分析中...</div>
       <div class="ocr-result" id="scamResult"></div>
     </div>
@@ -113,25 +123,25 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
   <div class="page">
     <div class="card">
       <div class="card-icon"><svg width="48" height="48" viewBox="0 0 64 64" fill="none" stroke="#e89a5c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="23" cy="17" r="4"/><path d="M26 20 Q30 25 33 30"/><path d="M28 24 Q24 26 21 29"/><path d="M30 25 Q34 23 37 21"/><path d="M33 30 Q31 35 28 39"/><path d="M33 30 Q38 33 42 34"/><path d="M46 30 Q49 32 46 34"/><path d="M49 28 Q53 32 49 36"/></svg></div>
-      <div class="page-title">摔倒检测</div>
-      <div class="page-sub">时刻守护您的安全</div>
+      <div class="page-title" data-i18n="p3t">摔倒检测</div>
+      <div class="page-sub" data-i18n="p3s">时刻守护您的安全</div>
       <div style="display:flex;align-items:center;gap:14px;margin:14px 0">
         <div style="width:52px;height:30px;border-radius:15px;background:#4caf50;position:relative;cursor:pointer;transition:background .3s" id="fallSwitch" onclick="toggleFall()">
           <div style="width:24px;height:24px;border-radius:50%;background:#fff;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,0.2)" id="fallKnob"></div>
         </div>
-        <span id="fallStatus" style="font-size:20px;color:#4caf50;font-weight:600;transition:color .3s">已开启</span>
+        <span id="fallStatus" data-i18n="fallOn" style="font-size:20px;color:#4caf50;font-weight:600;transition:color .3s">已开启</span>
       </div>
-      <div style="font-size:14px;color:#aaa;margin-bottom:10px">检测到摔倒自动通知紧急联系人</div>
+      <div data-i18n="fallDesc" style="font-size:14px;color:#aaa;margin-bottom:10px">检测到摔倒自动通知紧急联系人</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
-        <button onclick="startFallDetection()" style="padding:10px 22px;border:none;border-radius:12px;background:linear-gradient(135deg,#e89a5c,#d4823a);color:#fff;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 10px rgba(232,154,92,0.25)">📳 开始检测</button>
-        <button onclick="simulateFall()" style="padding:10px 22px;border:none;border-radius:12px;background:#fff;color:#e89a5c;font-size:15px;font-weight:500;cursor:pointer;border:2px solid #e89a5c">🎬 演示模式</button>
+        <button onclick="startFallDetection()" data-i18n="startDetect" style="padding:10px 22px;border:none;border-radius:12px;background:linear-gradient(135deg,#e89a5c,#d4823a);color:#fff;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 10px rgba(232,154,92,0.25)">📳 开始检测</button>
+        <button onclick="simulateFall()" data-i18n="demoMode" style="padding:10px 22px;border:none;border-radius:12px;background:#fff;color:#e89a5c;font-size:15px;font-weight:500;cursor:pointer;border:2px solid #e89a5c">🎬 演示模式</button>
       </div>
-      <div style="font-size:12px;color:#ccc;margin-top:6px">开始检测后，剧烈晃动手机可触发警报</div>
+      <div data-i18n="shakeHint" style="font-size:12px;color:#ccc;margin-top:6px">开始检测后，剧烈晃动手机可触发警报</div>
     </div>
   </div>
 </div>
 
-<button class="settings-btn">⚙️</button>
+<button class="settings-btn" onclick="toggleSettings()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 
 <div class="top-bar">
   <span class="time" id="topTime">12:00</span>
@@ -148,10 +158,36 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
   <div class="modal-box">
     <div class="modal-title">📋 识别结果</div>
     <div class="modal-text" id="modalText"></div>
-    <button class="modal-voice" onclick="speakModal()">🔊 再听一遍</button>
-    <button class="modal-close" onclick="closeModal()">知道了</button>
+    <button class="modal-voice" onclick="speakModal()" data-i18n="listenAgain">🔊 再听一遍</button>
+    <button class="modal-close" onclick="closeModal()" data-i18n="gotIt">知道了</button>
   </div>
 </div>
+
+<!-- 设置面板 -->
+<div class="settings-panel" id="setPanel">
+  <button class="close-settings" onclick="toggleSettings()">✕</button>
+  <h2 data-i18n="settings">设置</h2>
+  <div class="setting-group">
+    <label data-i18n="fontSize">🔤 字体大小</label>
+    <div class="opt-group" id="sizeGroup">
+      <button data-v="s">小</button>
+      <button data-v="m" class="active">中</button>
+      <button data-v="l">大</button>
+    </div>
+  </div>
+  <div class="setting-group">
+    <label data-i18n="language">🌐 语言</label>
+    <div class="opt-group" id="langGroup" style="flex-wrap:wrap">
+      <button data-v="zh" class="active">中文</button>
+      <button data-v="en">English</button>
+      <button data-v="es">Español</button>
+      <button data-v="fr">Français</button>
+      <button data-v="ru">Русский</button>
+      <button data-v="ar">العربية</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
 // ===== Time =====
@@ -208,10 +244,10 @@ function handlePhoto(input) {
         })
       });
       const data = await resp.json();
-      const text = data.choices?.[0]?.message?.content || '未识别到文字';
+      const text = data.choices?.[0]?.message?.content || (L('未识别到文字','No text recognized','Sin texto','Aucun texte','Текст не найден','لا يوجد نص'));
       showModal(text);
     } catch(err) {
-      showModal('⚠️ 识别失败，请重试');
+      showModal(L('⚠️ 识别失败，请重试','⚠️ Recognition failed, please retry','⚠️ Error de reconocimiento','⚠️ Échec de reconnaissance','⚠️ Ошибка распознавания','⚠️ فشل التعرف'));
       // result.classList.add('show');
     }
     loading.classList.remove('show');
@@ -223,7 +259,7 @@ function handlePhoto(input) {
 async function checkScam() {
   const input = document.getElementById('scamInput').value.trim();
   if (!input) {
-    showModal('请先输入电话号码或短信内容');
+    showModal(L('请先输入电话号码或短信内容','Please enter a phone number or message','Ingrese número o mensaje','Entrez numéro ou message','Введите номер или сообщение','أدخل الرقم أو الرسالة'));
     return;
   }
   const loading = document.getElementById('scamLoading');
@@ -239,15 +275,17 @@ async function checkScam() {
         model: 'qwen-plus',
         messages: [{
           role: 'user',
-          content: '我要你帮我判断一个电话或短信是否安全。内容如下："' + input + '"。请按以下规则回答：1.如果只是一串普通电话号码、或者内容是日常消息（快递、验证码、朋友问候等），就回答"安全"并简短说明。2.只有当内容明显涉及索要钱财、转账、中奖交钱、冒充公检法、验证码、账号密码等诈骗特征时，才判断为"诈骗"。3.回答用最通俗的话，像对80岁老人解释：先给结论（安全/诈骗），再简短说明原因和怎么做。总字数60字以内，语气亲切。不要夸大，不要把所有号码都当诈骗。'
+          content: currentLang === 'zh'
+            ? '我要你帮我判断一个电话或短信是否安全。内容如下："' + input + '"。请按以下规则回答：1.如果只是一串普通电话号码、或者内容是日常消息，就回答"安全"并简短说明。2.只有当内容明显涉及索要钱财、转账、中奖交钱、冒充公检法、验证码等诈骗特征时，才判断为"诈骗"。3.用最通俗的话回答：先给结论，再简短说明原因和怎么做。总字数60字以内。不要夸大。'
+            : 'I need you to judge whether this phone number or message is safe. Content: "' + input + '". Rules: 1. If it is just a normal phone number or daily message (delivery, verification code, friend greeting), answer "SAFE" with brief explanation. 2. Only judge as "SCAM" if it clearly involves asking for money, transfer, lottery fees, impersonating police, verification codes, passwords. 3. Answer in simple words, like explaining to an 80-year-old: conclusion first, then short reason and what to do. Within 60 words. Do not exaggerate.'
         }]
       })
     });
     const data = await resp.json();
-    const text = data.choices?.[0]?.message?.content || '无法判断，请咨询家人';
+    const text = data.choices?.[0]?.message?.content || (L('无法判断，请咨询家人','Cannot determine, please ask family','No se puede determinar','Impossible à déterminer','Невозможно определить','لا يمكن تحديد'));
     showModal(text);
   } catch(err) {
-    showModal('⚠️ 检测失败，请重试');
+    showModal(L('⚠️ 检测失败，请重试','⚠️ Detection failed, please retry','⚠️ Error de detección','⚠️ Échec de détection','⚠️ Ошибка','⚠️ فشل الكشف'));
   }
   loading.classList.remove('show');
 }
@@ -261,7 +299,7 @@ let lastMotionTime = 0;
 
 function startFallDetection() {
   if (typeof DeviceMotionEvent === 'undefined') {
-    showModal('⚠️ 此浏览器不支持传感器检测，请使用手机浏览器打开');
+    showModal(L('⚠️ 此浏览器不支持传感器检测，请使用手机浏览器打开','⚠️ Sensor not supported in this browser, please use mobile browser','⚠️ Sensor no compatible','⚠️ Capteur non supporté','⚠️ Датчик не поддерживается','⚠️ المستشعر غير مدعوم'));
     return;
   }
   // iOS需要请求权限
@@ -269,12 +307,12 @@ function startFallDetection() {
     DeviceMotionEvent.requestPermission().then(state => {
       if (state === 'granted') {
         window.addEventListener('devicemotion', handleMotion);
-        showModal('✅ 摔倒检测已启动，正在监听您的动作');
+        showModal(L('✅ 摔倒检测已启动，正在监听您的动作','✅ Fall detection started','✅ Detección activada','✅ Détection activée','✅ Обнаружение запущено','✅ تم تفعيل الكشف'));
       }
-    }).catch(() => showModal('⚠️ 无法获取传感器权限'));
+    }).catch(() => showModal(L('⚠️ 无法获取传感器权限','⚠️ Cannot get sensor permission','⚠️ Sin permiso','⚠️ Permission refusée','⚠️ Нет доступа','⚠️ لا يوجد إذن')));
   } else {
     window.addEventListener('devicemotion', handleMotion);
-    showModal('✅ 摔倒检测已启动，正在监听您的动作');
+    showModal(L('✅ 摔倒检测已启动，正在监听您的动作','✅ Fall detection started','✅ Detección activada','✅ Détection activée','✅ Обнаружение запущено','✅ تم تفعيل الكشف'));
   }
 }
 
@@ -299,7 +337,7 @@ function triggerFallAlert() {
   isAlerting = true;
   const st = document.getElementById('fallStatus');
   const sw = document.getElementById('fallSwitch');
-  st.textContent = '🚨 检测到摔倒！';
+  st.textContent = L('🚨 检测到摔倒！','🚨 Fall detected!','🚨 ¡Caída detectada!','🚨 Chute détectée!','🚨 Падение обнаружено!','🚨 تم اكتشاف سقوط');
   st.style.color = '#c62828';
   sw.style.background = '#c62828';
   if (navigator.vibrate) { navigator.vibrate([500,200,500]); }
@@ -308,7 +346,8 @@ function triggerFallAlert() {
   if (!dismissBtn) {
     dismissBtn = document.createElement('button');
     dismissBtn.id = 'dismissBtn';
-    dismissBtn.textContent = '✅ 我没事，关闭警报';
+    dismissBtn.setAttribute('data-i18n', 'dismissAlert');
+    dismissBtn.textContent = L('✅ 我没事，关闭警报','✅ I am fine, dismiss','✅ Estoy bien','✅ Je vais bien','✅ Я в порядке','✅ أنا بخير');
     dismissBtn.style.cssText = 'padding:12px 24px;border:none;border-radius:14px;background:#fff;color:#c62828;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 3px 15px rgba(0,0,0,0.1);margin-top:8px;border:2px solid #c62828';
     dismissBtn.onclick = dismissAlert;
     document.querySelector('.page:nth-child(3) .card').appendChild(dismissBtn);
@@ -316,7 +355,7 @@ function triggerFallAlert() {
   dismissBtn.style.display = 'block';
   // 10秒后通知紧急联系人
   fallTimer = setTimeout(() => {
-    showModal('⏰ 未收到确认，已自动通知紧急联系人！');
+    showModal(L('⏰ 未收到确认，已自动通知紧急联系人！','⏰ No confirmation received, emergency contacts notified!','⏰ Sin confirmación, contactos avisados','⏰ Aucune confirmation, contacts prévenus','⏰ Нет ответа, контакты уведомлены','⏰ لا تأكيد، تم إخطار جهات الاتصال'));
     dismissAlert();
   }, 10000);
 }
@@ -343,7 +382,7 @@ function simulateFall() {
   isAlerting = true;
   const st = document.getElementById('fallStatus');
   const sw = document.getElementById('fallSwitch');
-  st.textContent = '🚨 摔倒警报！请确认安全';
+  st.textContent = L('🚨 摔倒警报！请确认安全','🚨 Fall alert! Please confirm','🚨 ¡Alerta de caída! Confirme','🚨 Alerte chute! Confirmez','🚨 Тревога! Подтвердите','🚨 تنبيه السقوط! أكد');
   st.style.color = '#c62828';
   sw.style.background = '#c62828';
   if (navigator.vibrate) { navigator.vibrate([500,200,500]); }
@@ -352,7 +391,8 @@ function simulateFall() {
   if (!dismissBtn) {
     dismissBtn = document.createElement('button');
     dismissBtn.id = 'dismissBtn';
-    dismissBtn.textContent = '✅ 我没事，关闭警报';
+    dismissBtn.setAttribute('data-i18n', 'dismissAlert');
+    dismissBtn.textContent = L('✅ 我没事，关闭警报','✅ I am fine, dismiss','✅ Estoy bien','✅ Je vais bien','✅ Я в порядке','✅ أنا بخير');
     dismissBtn.style.cssText = 'padding:12px 24px;border:none;border-radius:14px;background:#fff;color:#c62828;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 3px 15px rgba(0,0,0,0.1);margin-top:8px;border:2px solid #c62828';
     dismissBtn.onclick = dismissAlert;
     document.querySelector('.page:nth-child(3) .card').appendChild(dismissBtn);
@@ -360,7 +400,7 @@ function simulateFall() {
   dismissBtn.style.display = 'block';
   // 10秒后通知紧急联系人
   fallTimer = setTimeout(() => {
-    showModal('⏰ 未收到确认，已自动通知紧急联系人！');
+    showModal(L('⏰ 未收到确认，已自动通知紧急联系人！','⏰ No confirmation received, emergency contacts notified!','⏰ Sin confirmación, contactos avisados','⏰ Aucune confirmation, contacts prévenus','⏰ Нет ответа, контакты уведомлены','⏰ لا تأكيد، تم إخطار جهات الاتصال'));
     dismissAlert();
   }, 10000);
 }
@@ -379,10 +419,17 @@ function dismissAlert() {
 
 // ===== Day 4: 吃药提醒 =====
 function remindPill() {
-  showModal('💊 该吃药啦！记得按时吃药，身体才会好哦！');
+  showModal(L('💊 该吃药啦！记得按时吃药，身体才会好哦！','💊 Time to take your medicine!','💊 ¡Hora de tomar su medicina!','💊 Heure de prendre vos médicaments!','💊 Время принимать лекарство!','💊 حان وقت تناول الدواء!'));
 }
 
 // ===== 弹窗 =====
+
+// ===== 多语言文本 =====
+function L(zh, en, es, fr, ru, ar) {
+  const map = { zh: zh, en: en, es: es, fr: fr, ru: ru, ar: ar };
+  return map[currentLang] || zh;
+}
+
 function showModal(text) {
   document.getElementById("modalText").textContent = text;
   document.getElementById("modalOverlay").classList.add("show");
@@ -405,6 +452,123 @@ function speak(text) {
     window.speechSynthesis.speak(utterance);
   }
 }
+
+// ===== Day 4: 设置面板 + 多语言 =====
+function toggleSettings() {
+  document.getElementById('setPanel').classList.toggle('open');
+}
+
+// 字体大小
+document.getElementById('sizeGroup').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || !b.dataset.v) return;
+  document.querySelectorAll('#sizeGroup button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  const sizes = { s: '28px', m: '32px', l: '42px' };
+  document.querySelectorAll('.page-title').forEach(el => el.style.fontSize = sizes[b.dataset.v]);
+});
+
+// 多语言
+const i18nDict = {
+  zh: {
+    p1t: '拍药盒', p1s: '拍一拍，自动读出来', p1tag: '药品识别 · 生活助手',
+    pill: '下次吃药', p2t: '防诈骗', p2s: '查一下安不安全',
+    scamPh: '输入号码或短信内容', p3t: '摔倒检测', p3s: '时刻守护您的安全',
+    fallOn: '已开启', fallOff: '已关闭',
+    fallDesc: '检测到摔倒自动通知紧急联系人',
+    startDetect: '📳 开始检测', demoMode: '🎬 演示模式',
+    shakeHint: '开始检测后，剧烈晃动手机可触发警报',
+    settings: '设置', fontSize: '🔤 字体大小', language: '🌐 语言', remindBtn: '提醒', listenAgain: '🔊 再听一遍', gotIt: '知道了', checkBtn: '🔍 检测', takePhoto: '拍照'
+  },
+  en: {
+    p1t: 'Scan Medicine', p1s: 'Take a photo, AI reads it aloud', p1tag: 'Medicine ID · Life Assistant',
+    pill: 'Next pill', p2t: 'Scam Guard', p2s: 'Check if it is safe',
+    scamPh: 'Enter number or SMS text', p3t: 'Fall Detection', p3s: 'Always protecting you',
+    fallOn: 'ON', fallOff: 'OFF',
+    fallDesc: 'Auto-notify emergency contacts when a fall is detected',
+    startDetect: '📳 Start Detection', demoMode: '🎬 Demo Mode',
+    shakeHint: 'Shake your phone hard to trigger the alarm',
+    settings: 'Settings', fontSize: '🔤 Font Size', language: '🌐 Language', remindBtn: 'Remind', listenAgain: '🔊 Listen again', gotIt: 'Got it', checkBtn: '🔍 Check', takePhoto: 'Take Photo'
+  },
+  es: {
+    p1t: 'Escanear Medicina', p1s: 'Tome una foto, la IA la lee', p1tag: 'Identificación de Medicamentos',
+    pill: 'Próxima pastilla', p2t: 'Anti-Estafa', p2s: 'Verifique si es seguro',
+    scamPh: 'Ingrese número o mensaje', p3t: 'Detección de Caídas', p3s: 'Protegiéndole siempre',
+    fallOn: 'ACTIVADO', fallOff: 'APAGADO',
+    fallDesc: 'Notifica a contactos de emergencia al detectar una caída',
+    startDetect: '📳 Iniciar Detección', demoMode: '🎬 Modo Demo',
+    shakeHint: 'Agite el teléfono para activar la alarma',
+    settings: 'Ajustes', fontSize: '🔤 Tamaño de Letra', language: '🌐 Idioma', remindBtn: 'Recordar', listenAgain: '🔊 Escuchar de nuevo', gotIt: 'Entendido', checkBtn: '🔍 Verificar', takePhoto: 'Tomar Foto'
+  },
+  fr: {
+    p1t: 'Scanner Médicament', p1s: 'Prenez une photo, la IA la lit', p1tag: 'Identification de Médicament',
+    pill: 'Prochain comprimé', p2t: 'Anti-Arnaque', p2s: 'Vérifiez la sécurité',
+    scamPh: 'Entrez numéro ou message', p3t: 'Détection de Chute', p3s: 'Protection permanente',
+    fallOn: 'ACTIVÉ', fallOff: 'DÉSACTIVÉ',
+    fallDesc: 'Prévient les contacts de secours en cas de chute',
+    startDetect: '📳 Démarrer', demoMode: '🎬 Mode Démo',
+    shakeHint: 'Secouez le téléphone pour activer',
+    settings: 'Réglages', fontSize: '🔤 Taille de Police', language: '🌐 Langue', remindBtn: 'Rappeler', listenAgain: '🔊 Réécouter', gotIt: 'Compris', checkBtn: '🔍 Vérifier', takePhoto: 'Prendre Photo'
+  },
+  ru: {
+    p1t: 'Сканировать Лекарство', p1s: 'Сфотографируйте, ИИ прочитает', p1tag: 'Определение Лекарства',
+    pill: 'Следующая таблетка', p2t: 'Анти-Мошенничество', p2s: 'Проверьте безопасность',
+    scamPh: 'Введите номер или сообщение', p3t: 'Детекция Падения', p3s: 'Всегда защищает вас',
+    fallOn: 'ВКЛ', fallOff: 'ВЫКЛ',
+    fallDesc: 'Уведомляет контакты при падении',
+    startDetect: '📳 Начать', demoMode: '🎬 Демо-режим',
+    shakeHint: 'Потрясите телефон для тревоги',
+    settings: 'Настройки', fontSize: '🔤 Размер Шрифта', language: '🌐 Язык', remindBtn: 'Напомнить', listenAgain: '🔊 Слушать ещё раз', gotIt: 'Понятно', checkBtn: '🔍 Проверить', takePhoto: 'Сфотографировать'
+  },
+  ar: {
+    p1t: 'مسح الدواء', p1s: 'التقط صورة وسيقرأها الذكاء الاصطناعي', p1tag: 'تحديد الدواء',
+    pill: 'الجرعة القادمة', p2t: 'مكافحة الاحتيال', p2s: 'تحقق من الأمان',
+    scamPh: 'أدخل الرقم أو الرسالة', p3t: 'كشف السقوط', p3s: 'حمايتك دائمًا',
+    fallOn: 'مفعّل', fallOff: 'متوقف',
+    fallDesc: 'إخطار جهات الاتصال عند السقوط',
+    startDetect: '📳 بدء الكشف', demoMode: '🎬 وضع العرض',
+    shakeHint: 'هز الهاتف لتفعيل التنبيه',
+    settings: 'الإعدادات', fontSize: '🔤 حجم الخط', language: '🌐 اللغة', remindBtn: 'تذكير', listenAgain: '🔊 إعادة الاستماع', gotIt: 'حسنا', checkBtn: '🔍 تحقق', takePhoto: 'التقاط صورة'
+  }
+};
+
+let currentLang = 'zh';
+function applyLang(lang) {
+  currentLang = lang;
+  const dict = i18nDict[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key]) el.textContent = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (dict[key]) el.placeholder = dict[key];
+  });
+  // 动态按钮（我没事）
+  const dismissBtn = document.getElementById('dismissBtn');
+  if (dismissBtn && dismissBtn.style.display !== 'none') {
+    dismissBtn.textContent = L('✅ 我没事，关闭警报','✅ I am fine, dismiss','✅ Estoy bien','✅ Je vais bien','✅ Я в порядке','✅ أنا بخير');
+  }
+  // 摔倒状态文字（6语言）
+  const st = document.getElementById('fallStatus');
+  if (st) {
+    const alertStates = ['🚨 检测到摔倒！','🚨 Fall detected!','🚨 ¡Caída detectada!','🚨 Chute détectée!','🚨 Падение обнаружено!','🚨 تم اكتشاف سقوط','🚨 摔倒警报！请确认安全','🚨 Fall alert! Please confirm','🚨 ¡Alerta de caída! Confirme','🚨 Alerte chute! Confirmez','🚨 Тревога! Подтвердите','🚨 تنبيه السقوط! أكد'];
+    if (alertStates.includes(st.textContent)) {
+      st.textContent = L('🚨 检测到摔倒！','🚨 Fall detected!','🚨 ¡Caída detectada!','🚨 Chute détectée!','🚨 Падение обнаружено!','🚨 تم اكتشاف سقوط');
+    } else {
+      const isOff = st.style.color === 'rgb(187, 187, 187)';
+      st.textContent = L(isOff ? '已关闭' : '已开启', isOff ? 'OFF' : 'ON', isOff ? 'APAGADO' : 'ACTIVADO', isOff ? 'DÉSACTIVÉ' : 'ACTIVÉ', isOff ? 'ВЫКЛ' : 'ВКЛ', isOff ? 'متوقف' : 'مفعّل');
+    }
+  }
+}
+
+document.getElementById('langGroup').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || !b.dataset.v) return;
+  document.querySelectorAll('#langGroup button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  applyLang(b.dataset.v);
+});
 </script>
+
+
 </body>
 </html>
