@@ -219,9 +219,21 @@ function updateTime() {
 updateTime();
 setInterval(updateTime, 30000);
 
-// ===== Splash → Main =====
+// ===== Splash → Main → Why弹窗 =====
 setTimeout(() => {
   document.getElementById('splash').classList.add('hide');
+  // 显示Why Qin'An弹窗
+  setTimeout(() => {
+    const whyText = L(
+      '为什么做亲安？\n\n有一天，我爷爷独自在家摔倒，身边没有人。我回家后才知道他的脚踝受伤了。这段经历让我决定，为独居老人做一个安静的守护者。',
+      'Why Qin\'An?\n\nOne day, my grandfather fell at home while no one was there. I only learned about his injured ankle after I came home. That experience inspired me to build a quiet companion for older adults living alone.',
+      '¿Por qué Qin\'An?\n\nUn día, mi abuelo se cayó en casa sin que nadie estuviera allí. Solo me enteré de su tobillo lesionado cuando volví a casa. Esa experiencia me inspiró a crear un compañero tranquilo para los adultos mayores que viven solos.',
+      'Pourquoi Qin\'An ?\n\nUn jour, mon grand-père est tombé à la maison alors que personne n\'était là. Je n\'ai appris sa blessure à la cheville qu\'en rentrant à la maison. Cette expérience m\'a inspiré à créer un compagnon tranquille pour les personnes âgées vivant seules.',
+      'Почему Qin\'An?\n\nОднажды мой дедушка упал дома, когда рядом никого не было. Я узнал о его травме только вернувшись домой. Этот опыт вдохновил меня создать тихого помощника для пожилых людей, живущих одних.',
+      'لماذا Qin\'An؟\n\nفي أحد الأيام، سقط جدي في المنزل ولم يكن هناك أحد. لم أعرف عن إصابته إلا بعد عودتي إلى المنزل. هذه التجربة ألهمتني لإنشاء رفيق هادئ لكبار السن الذين يعيشون وحدهم.'
+    );
+    showWhyModal(whyText);
+  }, 800);
 }, 1500);
 
 // ===== Dots =====
@@ -554,6 +566,20 @@ window.addEventListener('load', () => {
 function L(zh, en, es, fr, ru, ar) {
   const map = { zh: zh, en: en, es: es, fr: fr, ru: ru, ar: ar };
   return map[currentLang] || zh;
+}
+
+function showWhyModal(text) {
+  const modalText = document.getElementById('modalText');
+  const modalTitle = document.querySelector('.modal-title');
+  const voiceBtn = document.querySelector('.modal-voice');
+  const closeBtn = document.querySelector('.modal-close');
+  if (modalText) modalText.textContent = text;
+  if (modalTitle) modalTitle.textContent = L('💖 为什么做亲安？','💖 Why Qin\'An?','💖 ¿Por qué Qin\'An?','💖 Pourquoi Qin\'An?','💖 Почему Qin\'An?','💖 لماذا Qin\'An?');
+  if (closeBtn) closeBtn.textContent = L('开始体验','Start','Empezar','Commencer','Начать','ابدأ');
+  if (voiceBtn) voiceBtn.style.display = 'none';
+  document.getElementById('modalOverlay').classList.add('show');
+  // 播放语音
+  speak(text.replace(/\n/g, ' '));
 }
 
 function showModal(text) {
