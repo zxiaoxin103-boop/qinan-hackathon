@@ -89,7 +89,7 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
     <div class="card">
       <div class="card-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e89a5c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
       <div class="page-title" data-i18n="p1t">拍药盒</div>
-      <div class="page-sub" data-i18n="p1s">拍一拍，自动读出来</div>
+      <div class="page-sub" data-i18n="p1s">AI识别药品并朗读信息</div>
       <button class="main-btn" onclick="document.getElementById('fileInput').click()">
         <span class="icon"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span><span data-i18n="takePhoto">拍照</span>
       </button>
@@ -106,7 +106,7 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
     <div class="card">
       <div class="card-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e89a5c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
       <div class="page-title" data-i18n="p2t">防诈骗</div>
-      <div class="page-sub" data-i18n="p2s">查一下安不安全</div>
+      <div class="page-sub" data-i18n="p2s">AI分析可疑信息和电话</div>
       <div class="input-area">
         <input type="text" id="scamInput" placeholder="输入号码或短信内容" data-i18n-placeholder="scamPh">
       </div>
@@ -607,8 +607,8 @@ const i18nDict = {
     settings: '设置', fontSize: '🔤 字体大小', language: '🌐 语言', remindBtn: '提醒', listenAgain: '🔊 再听一遍', gotIt: '知道了', checkBtn: '🔍 检测', takePhoto: '拍照', medNamePh: '药品名称', medDosePh: '用量(如:1片)', recognizing: '🔍 正在识别中...', analyzing: '🔍 正在分析中...', resultTitle: '📋 识别结果', p4t: '药库', p4s: '管理您的药品和用药计划', addMed: '➕ 添加药品', medHint: '添加药品后自动生成用药时间表', emptyMeds: '📭 还没有药品，添加第一种吧'
   },
   en: {
-    p1t: 'Scan Medicine', p1s: 'Take a photo, AI reads it aloud', p1tag: 'Medicine ID · Life Assistant',
-    pill: 'Next pill', p2t: 'Scam Guard', p2s: 'Check if it is safe',
+    p1t: 'Scan Medicine', p1s: 'AI identifies the medicine and reads it aloud', p1tag: 'Medicine ID · Life Assistant',
+    pill: 'Next pill', p2t: 'Scam Guard', p2s: 'AI analyzes messages and numbers for scams',
     scamPh: 'Enter number or SMS text', p3t: 'Fall Detection', p3s: 'Always protecting you',
     fallOn: 'ON', fallOff: 'OFF',
     fallDesc: 'Prototype: shake to simulate a fall and trigger alert
@@ -618,7 +618,7 @@ Future App: automatic detection with motion sensors',
     settings: 'Settings', fontSize: '🔤 Font Size', language: '🌐 Language', remindBtn: 'Remind', listenAgain: '🔊 Listen again', gotIt: 'Got it', checkBtn: '🔍 Check', takePhoto: 'Take Photo', medNamePh: 'Medicine name', medDosePh: 'Dose (e.g. 1 pill)', recognizing: '🔍 Recognizing...', analyzing: '🔍 Analyzing...', resultTitle: '📋 Result', p4t: 'Medicine Cabinet', p4s: 'Manage your medicines and schedule', addMed: '➕ Add Medicine', medHint: 'Schedule auto-generates after adding', emptyMeds: '📭 No medicines yet, add your first one'
   },
   es: {
-    p1t: 'Escanear Medicina', p1s: 'Tome una foto, la IA la lee', p1tag: 'Identificación de Medicamentos',
+    p1t: 'Escanear Medicina', p1s: 'La IA identifica y lee la información', p1tag: 'Identificación de Medicamentos',
     pill: 'Próxima pastilla', p2t: 'Anti-Estafa', p2s: 'Verifique si es seguro',
     scamPh: 'Ingrese número o mensaje', p3t: 'Detección de Caídas', p3s: 'Protegiéndole siempre',
     fallOn: 'ACTIVADO', fallOff: 'APAGADO',
@@ -628,7 +628,7 @@ Future App: automatic detection with motion sensors',
     settings: 'Ajustes', fontSize: '🔤 Tamaño de Letra', language: '🌐 Idioma', remindBtn: 'Recordar', listenAgain: '🔊 Escuchar de nuevo', gotIt: 'Entendido', checkBtn: '🔍 Verificar', takePhoto: 'Tomar Foto', medNamePh: 'Nombre del medicamento', medDosePh: 'Dosis (ej: 1 pastilla)', recognizing: '🔍 Reconociendo...', analyzing: '🔍 Analizando...', resultTitle: '📋 Resultado', p4t: 'Botiquín', p4s: 'Gestione sus medicamentos', addMed: '➕ Añadir', medHint: 'El horario se genera automáticamente', emptyMeds: '📭 Sin medicamentos'
   },
   fr: {
-    p1t: 'Scanner Médicament', p1s: 'Prenez une photo, la IA la lit', p1tag: 'Identification de Médicament',
+    p1t: 'Scanner Médicament', p1s: 'La IA identifie et lit les informations', p1tag: 'Identification de Médicament',
     pill: 'Prochain comprimé', p2t: 'Anti-Arnaque', p2s: 'Vérifiez la sécurité',
     scamPh: 'Entrez numéro ou message', p3t: 'Détection de Chute', p3s: 'Protection permanente',
     fallOn: 'ACTIVÉ', fallOff: 'DÉSACTIVÉ',
@@ -638,7 +638,7 @@ Future App: automatic detection with motion sensors',
     settings: 'Réglages', fontSize: '🔤 Taille de Police', language: '🌐 Langue', remindBtn: 'Rappeler', listenAgain: '🔊 Réécouter', gotIt: 'Compris', checkBtn: '🔍 Vérifier', takePhoto: 'Prendre Photo', medNamePh: 'Nom du médicament', medDosePh: 'Dose (ex: 1 comprimé)', recognizing: '🔍 Reconnaissance...', analyzing: '🔍 Analyse...', resultTitle: '📋 Résultat', p4t: 'Armoire à Médicaments', p4s: 'Gérez vos médicaments', addMed: '➕ Ajouter', medHint: 'Horaire généré automatiquement', emptyMeds: '📭 Aucun médicament'
   },
   ru: {
-    p1t: 'Сканировать Лекарство', p1s: 'Сфотографируйте, ИИ прочитает', p1tag: 'Определение Лекарства',
+    p1t: 'Сканировать Лекарство', p1s: 'ИИ определяет и читает информацию', p1tag: 'Определение Лекарства',
     pill: 'Следующая таблетка', p2t: 'Анти-Мошенничество', p2s: 'Проверьте безопасность',
     scamPh: 'Введите номер или сообщение', p3t: 'Детекция Падения', p3s: 'Всегда защищает вас',
     fallOn: 'ВКЛ', fallOff: 'ВЫКЛ',
@@ -648,7 +648,7 @@ Future App: automatic detection with motion sensors',
     settings: 'Настройки', fontSize: '🔤 Размер Шрифта', language: '🌐 Язык', remindBtn: 'Напомнить', listenAgain: '🔊 Слушать ещё раз', gotIt: 'Понятно', checkBtn: '🔍 Проверить', takePhoto: 'Сфотографировать', medNamePh: 'Название лекарства', medDosePh: 'Доза (напр: 1 таблетка)', recognizing: '🔍 Распознавание...', analyzing: '🔍 Анализ...', resultTitle: '📋 Результат', p4t: 'Аптечка', p4s: 'Управляйте лекарствами', addMed: '➕ Добавить', medHint: 'Расписание создаётся автоматически', emptyMeds: '📭 Нет лекарств'
   },
   ar: {
-    p1t: 'مسح الدواء', p1s: 'التقط صورة وسيقرأها الذكاء الاصطناعي', p1tag: 'تحديد الدواء',
+    p1t: 'مسح الدواء', p1s: 'الذكاء الاصطناعي يحدد ويقرأ المعلومات', p1tag: 'تحديد الدواء',
     pill: 'الجرعة القادمة', p2t: 'مكافحة الاحتيال', p2s: 'تحقق من الأمان',
     scamPh: 'أدخل الرقم أو الرسالة', p3t: 'كشف السقوط', p3s: 'حمايتك دائمًا',
     fallOn: 'مفعّل', fallOff: 'متوقف',
