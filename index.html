@@ -96,7 +96,7 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
       <input type="file" id="fileInput" accept="image/*" onchange="handlePhoto(this)">
       <span class="tag" data-i18n="p1tag">药品识别 · 生活助手</span>
 
-      <div class="ocr-loading" id="ocrLoading">🔍 正在识别中...</div>
+      <div class="ocr-loading" id="ocrLoading" data-i18n="recognizing">🔍 正在识别中...</div>
       <div class="ocr-result" id="ocrResult"></div>
     </div>
   </div>
@@ -111,7 +111,7 @@ body{background:#f5f0e8;font-family:system-ui,-apple-system,'PingFang SC','Micro
         <input type="text" id="scamInput" placeholder="输入号码或短信内容" data-i18n-placeholder="scamPh">
       </div>
       <button class="check-btn" onclick="checkScam()" data-i18n="checkBtn">🔍 检测</button>
-      <div class="ocr-loading" id="scamLoading">🔍 正在分析中...</div>
+      <div class="ocr-loading" id="scamLoading" data-i18n="analyzing">🔍 正在分析中...</div>
       <div class="ocr-result" id="scamResult"></div>
     </div>
   </div>
@@ -246,7 +246,7 @@ function handlePhoto(input) {
   reader.onload = async function(e) {
     const base64 = e.target.result.split(',')[1];
     try {
-      // 调用阿里云 DashScope OCR API
+      // 调用阿里云 DashScope OCR API（第一步：中文识别，视觉模型最稳）
       const resp = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -259,13 +259,35 @@ function handlePhoto(input) {
             role: 'user',
             content: [
               { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + base64 } },
-              { type: 'text', text: '这是一张药品包装的照片。请用最通俗易懂的话，像跟80岁老人解释一样，说清楚：1.这是什么药（名称）2.治什么病（用大白话，别说专业术语）3.怎么吃（直接说一次吃几粒/几片、一天吃几次、什么时候吃，不要说"400单位""mg"这种单位，直接换算成人话）4.注意事项（用一句话）。总字数控制在60字以内，语气亲切。如果照片不是药品，简单说是什么就行。' }
+              { type: 'text', text: '这是一张药品包装的照片。请用最通俗易懂的话，像跟80岁老人解释一样，说清楚：1.这是什么药（名称）2.治什么病（用大白话）3.怎么吃（直接说一次吃几粒、一天几次、什么时候吃）4.注意事项。总字数60字以内，语气亲切。' }
             ]
           }]
         })
       });
       const data = await resp.json();
-      const text = data.choices?.[0]?.message?.content || (L('未识别到文字','No text recognized','Sin texto','Aucun texte','Текст не найден','لا يوجد نص'));
+      let text = data.choices?.[0]?.message?.content || '';
+      // 第二步：如果当前语言不是中文，用文本模型翻译
+      if (currentLang !== 'zh' && text) {
+        const langName = currentLang === 'en' ? 'English' : currentLang === 'es' ? 'Spanish' : currentLang === 'fr' ? 'French' : currentLang === 'ru' ? 'Russian' : 'Arabic';
+        const tResp = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer sk-ws-H.EHPEXYH.gs4t.MEQCIHt2SfZZFPgQGxm3k-ef697w2ypJ_JXcDLrEuWNif40oAiA5svAShD-Zz8dCHLxyRVzkRtOXSMryNjHOOQHXVi55IA'
+          },
+          body: JSON.stringify({
+            model: 'qwen-plus',
+            messages: [{
+              role: 'user',
+              content: 'Translate the following text into ' + langName + '. Keep it simple and friendly, as if talking to an elderly person. Only output the translation, nothing else. Text: ' + text
+            }]
+          })
+        });
+        const tData = await tResp.json();
+        const translated = tData.choices?.[0]?.message?.content;
+        if (translated) text = translated.trim();
+      }
+      if (!text) text = L('未识别到文字','No text recognized','Sin texto','Aucun texte','Текст не найден','لا يوجد نص');
       showModal(text);
     } catch(err) {
       showModal(L('⚠️ 识别失败，请重试','⚠️ Recognition failed, please retry','⚠️ Error de reconocimiento','⚠️ Échec de reconnaissance','⚠️ Ошибка распознавания','⚠️ فشل التعرف'));
@@ -296,14 +318,34 @@ async function checkScam() {
         model: 'qwen-plus',
         messages: [{
           role: 'user',
-          content: currentLang === 'zh'
-            ? '我要你帮我判断一个电话或短信是否安全。内容如下："' + input + '"。请按以下规则回答：1.如果只是一串普通电话号码、或者内容是日常消息，就回答"安全"并简短说明。2.只有当内容明显涉及索要钱财、转账、中奖交钱、冒充公检法、验证码等诈骗特征时，才判断为"诈骗"。3.用最通俗的话回答：先给结论，再简短说明原因和怎么做。总字数60字以内。不要夸大。'
-            : 'I need you to judge whether this phone number or message is safe. Content: "' + input + '". Rules: 1. If it is just a normal phone number or daily message (delivery, verification code, friend greeting), answer "SAFE" with brief explanation. 2. Only judge as "SCAM" if it clearly involves asking for money, transfer, lottery fees, impersonating police, verification codes, passwords. 3. Answer in simple words, like explaining to an 80-year-old: conclusion first, then short reason and what to do. Within 60 words. Do not exaggerate.'
+          content: '我要你帮我判断一个电话或短信是否安全。内容如下："' + input + '"。请按以下规则回答：1.如果只是一串普通电话号码、或者内容是日常消息，就回答"安全"并简短说明。2.只有当内容明显涉及索要钱财、转账、中奖交钱、冒充公检法、验证码等诈骗特征时，才判断为"诈骗"。3.用最通俗的话回答：先给结论，再简短说明原因和怎么做。总字数60字以内。不要夸大。'
         }]
       })
     });
     const data = await resp.json();
-    const text = data.choices?.[0]?.message?.content || (L('无法判断，请咨询家人','Cannot determine, please ask family','No se puede determinar','Impossible à déterminer','Невозможно определить','لا يمكن تحديد'));
+    let text = data.choices?.[0]?.message?.content || '';
+    // 第二步：非中文时翻译
+    if (currentLang !== 'zh' && text) {
+      const langName = currentLang === 'en' ? 'English' : currentLang === 'es' ? 'Spanish' : currentLang === 'fr' ? 'French' : currentLang === 'ru' ? 'Russian' : 'Arabic';
+      const tResp = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer sk-ws-H.EHPEXYH.gs4t.MEQCIHt2SfZZFPgQGxm3k-ef697w2ypJ_JXcDLrEuWNif40oAiA5svAShD-Zz8dCHLxyRVzkRtOXSMryNjHOOQHXVi55IA'
+        },
+        body: JSON.stringify({
+          model: 'qwen-plus',
+          messages: [{
+            role: 'user',
+            content: 'Translate the following text into ' + langName + '. Keep it simple and friendly, as if talking to an elderly person. Only output the translation, nothing else. Text: ' + text
+          }]
+        })
+      });
+      const tData = await tResp.json();
+      const translated = tData.choices?.[0]?.message?.content;
+      if (translated) text = translated.trim();
+    }
+    if (!text) text = L('无法判断，请咨询家人','Cannot determine, please ask family','No se puede determinar','Impossible à déterminer','Невозможно определить','لا يمكن تحديد');
     showModal(text);
   } catch(err) {
     showModal(L('⚠️ 检测失败，请重试','⚠️ Detection failed, please retry','⚠️ Error de detección','⚠️ Échec de détection','⚠️ Ошибка','⚠️ فشل الكشف'));
@@ -531,7 +573,8 @@ function speakModal() {
 function speak(text) {
   if ('speechSynthesis' in window) {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
+    const langMap = { zh: 'zh-CN', en: 'en-US', es: 'es-ES', fr: 'fr-FR', ru: 'ru-RU', ar: 'ar-SA' };
+    utterance.lang = langMap[currentLang] || 'zh-CN';
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   }
