@@ -685,6 +685,23 @@ const i18nDict = {
 };
 
 let currentLang = 'zh';
+// 页面加载时检测URL参数，自动切换语言
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const langParam = params.get('lang');
+  if (langParam && ['zh','en','es','fr','ru','ar'].includes(langParam)) {
+    // 延迟到DOM加载后执行
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelectorAll('#langGroup button').forEach(b => b.classList.remove('active'));
+        const btn = document.querySelector('#langGroup button[data-v="' + langParam + '"]');
+        if (btn) btn.classList.add('active');
+        applyLang(langParam);
+      }, 500);
+    });
+  }
+})();
+
 function applyLang(lang) {
   currentLang = lang;
   const dict = i18nDict[lang];
