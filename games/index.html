@@ -100,6 +100,11 @@ body::before{
     radial-gradient(ellipse 90% 70% at 20% 15%, rgba(255,255,255,0.20), transparent 60%),
     linear-gradient(150deg, #C9A6E0 0%, #9B6BC4 58%, #7E52A8 100%);
 }
+.tile-bomb{
+  background:
+    radial-gradient(ellipse 90% 70% at 20% 15%, rgba(255,255,255,0.24), transparent 60%),
+    linear-gradient(150deg, #FFB8B0 0%, #E8756A 58%, #C85A52 100%);
+}
 
 /* 卡片内装饰 */
 .game-tile::before{
@@ -178,12 +183,23 @@ body::before{
 </div>
 
 <div class="game-list">
+  <a href="bomb.html" class="game-tile tile-bomb">
+    <div class="tile-inner">
+      <div class="tile-icon">💣</div>
+      <div class="tile-text">
+        <div class="tile-title">数字炸弹</div>
+        <div class="tile-desc">猜数字 · 范围缩小 · 踩雷喝酒</div>
+      </div>
+      <div class="tile-arrow">›</div>
+    </div>
+  </a>
+
   <a href="party.html" class="game-tile tile-party">
     <div class="tile-inner">
       <div class="tile-icon">🎴</div>
       <div class="tile-text">
         <div class="tile-title">真心话大冒险</div>
-        <div class="tile-desc">聚会必备 · 44道题 · 翻牌抽题</div>
+        <div class="tile-desc">温和/刺激 · 转盘选人 · 100道题</div>
       </div>
       <div class="tile-arrow">›</div>
     </div>
