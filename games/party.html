@@ -242,11 +242,12 @@ body{
 .wheel-label{
   position:absolute;
   top:50%;left:50%;
-  transform-origin:0 0;
+  transform-origin:center center;
   font-size:13px;font-weight:600;color:#fff;
-  text-shadow:0 1px 4px rgba(0,0,0,0.18);
+  text-shadow:0 1px 4px rgba(0,0,0,0.22);
   white-space:nowrap;
   pointer-events:none;
+  letter-spacing:1px;
 }
 
 .wheel-result{
@@ -723,16 +724,16 @@ function buildWheel() {
   }
   wheel.style.background = `conic-gradient(${stops.join(',')})`;
 
-  // 标签
-  document.querySelectorAll('.wheel-label').forEach(el => el.remove());
+  // 标签（放在转盘内部，跟着一起转）
+  wheel.querySelectorAll('.wheel-label').forEach(el => el.remove());
   for (let i = 0; i < n; i++) {
     const label = document.createElement('div');
     label.className = 'wheel-label';
     const angle = i * segAngle + segAngle / 2;
     label.textContent = players[i];
-    // 旋转到扇区中间，并沿半径偏移
-    label.style.transform = `rotate(${angle - 90}deg) translate(72px) rotate(${-(angle - 90)}deg)`;
-    wheel.parentElement.appendChild(label);
+    // 从圆心旋转到扇区方向，再向外推
+    label.style.transform = `translate(-50%,-50%) rotate(${angle}deg) translateY(-86px)`;
+    wheel.appendChild(label);
   }
   wheelBuilt = true;
 }
@@ -750,10 +751,14 @@ function spinWheel() {
 
   // 随机目标
   const targetIdx = Math.floor(Math.random() * n);
-  // 目标角度：让 targetIdx 扇区的中线对准指针（顶部）
-  const targetAngle = 360 * 5 + (360 - (targetIdx * segAngle + segAngle / 2));
+  // 让 targetIdx 扇区的中线转到指针（顶部）位置
+  const angleMid = targetIdx * segAngle + segAngle / 2;
+  const currentMod = ((wheelRotation % 360) + 360) % 360;
+  const targetMod = ((360 - angleMid) % 360 + 360) % 360;
+  let delta = targetMod - currentMod;
+  if (delta < 0) delta += 360;
 
-  wheelRotation += targetAngle;
+  wheelRotation += 360 * 5 + delta;  // 转5圈 + 精准落位
   wheel.style.transform = `rotate(${wheelRotation}deg)`;
 
   setTimeout(() => {
