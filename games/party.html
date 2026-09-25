@@ -632,6 +632,7 @@ let lastIdx = {truth: -1, dare: -1};
 let players = ['我', '朋友A', '朋友B'];
 let wheelRotation = 0;
 let spinning = false;
+let lastWheelIdx = -1;  // 上一次转到的玩家（避免连续重复）
 
 // ==================== 模式切换 ====================
 function setMode(m) {
@@ -749,8 +750,14 @@ function spinWheel() {
   const n = players.length;
   const segAngle = 360 / n;
 
-  // 随机目标
-  const targetIdx = Math.floor(Math.random() * n);
+  // 随机目标（避免连续转到同一个人）
+  let targetIdx;
+  let guard = 0;
+  do {
+    targetIdx = Math.floor(Math.random() * n);
+    guard++;
+  } while (n > 1 && targetIdx === lastWheelIdx && guard < 20);
+  lastWheelIdx = targetIdx;
   // 让 targetIdx 扇区的中线转到指针（顶部）位置
   const angleMid = targetIdx * segAngle + segAngle / 2;
   const currentMod = ((wheelRotation % 360) + 360) % 360;
