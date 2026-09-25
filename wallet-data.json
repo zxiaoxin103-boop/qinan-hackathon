@@ -1,0 +1,31 @@
+{
+  "ai_pay": {
+    "status": "已开通",
+    "status_since": "2026-09-26",
+    "note": "支付宝Agent支付已授权"
+  },
+  "balance": 0.00,
+  "budget": null,
+  "budget_note": "可在支付宝「AI钱包」里设置预算",
+  "last_update": "2026-09-26T01:20:00+08:00",
+  "records": [
+    {
+      "type": "in",
+      "amount": 0.01,
+      "note": "小金库开张 · 我们的第一枚硬币",
+      "date": "2026-09-26"
+    },
+    {
+      "type": "out",
+      "amount": 0.01,
+      "note": "星座运势体验（AI付首单）",
+      "date": "2026-09-26"
+    }
+  ],
+  "milestones": [
+    {
+      "date": "2026-09-26",
+      "event": "AI支付能力开通 · 第一笔交易完成（¥0.01）"
+    }
+  ]
+}
