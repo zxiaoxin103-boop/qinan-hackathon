@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>小金库</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#FFF0F5">
+<style>
+:root{
+  --rose:#F2A2B5;
+  --rose-soft:#FAD4E0;
+  --rose-deep:#D4788F;
+  --rose-dark:#A85677;
+  --violet:#B69ADD;
+  --violet-deep:#8E6BC4;
+  --gold:#C9A063;
+  --gold-light:#E3C88F;
+  --text:#5A3D4A;
+  --text-soft:#9A7585;
+  --white-glass:rgba(255,255,255,0.42);
+  --border-glass:rgba(255,255,255,0.7);
+  --green:#5BAF8A;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;
+  min-height:100vh;
+  padding:22px 16px 44px;
+  -webkit-user-select:none;user-select:none;
+  overflow-x:hidden;
+  color:var(--text);
+  position:relative;
+  background:#FFF0F5;
+}
+
+/* 背景色块 */
+.bg-blobs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:0.7}
+.blob.b1{width:340px;height:340px;background:radial-gradient(circle,#FFD9B8,transparent 70%);top:-90px;left:-80px}
+.blob.b2{width:300px;height:300px;background:radial-gradient(circle,#FFC5D8,transparent 70%);top:26%;right:-110px}
+.blob.b3{width:320px;height:320px;background:radial-gradient(circle,#E0CCF5,transparent 70%);bottom:-70px;left:-50px}
+.blob.b4{width:240px;height:240px;background:radial-gradient(circle,#FFE0EC,transparent 70%);bottom:16%;right:-70px}
+
+/* 标题 */
+.header{text-align:center;margin-bottom:18px;position:relative;z-index:2}
+.header .eyebrow{
+  font-size:10px;letter-spacing:5px;color:var(--gold);
+  text-transform:uppercase;margin-bottom:9px;
+}
+.header h1{
+  font-size:25px;letter-spacing:7px;font-weight:600;
+  color:var(--rose-dark);
+  text-shadow:0 2px 14px rgba(255,255,255,0.9);
+}
+.header .sub{
+  font-size:11px;color:var(--text-soft);letter-spacing:3px;margin-top:8px;
+  text-shadow:0 1px 8px rgba(255,255,255,0.9);
+}
+
+/* 余额卡片 */
+.balance-card{
+  background:linear-gradient(155deg,rgba(255,255,255,0.72),rgba(255,235,242,0.6));
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border:1px solid var(--border-glass);
+  border-radius:26px;
+  padding:26px 22px 22px;
+  margin-bottom:16px;
+  text-align:center;
+  position:relative;z-index:2;
+  box-shadow:
+    0 12px 40px rgba(212,120,143,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.balance-card::before{
+  content:'';position:absolute;inset:11px;border-radius:17px;
+  border:1.5px dashed rgba(201,160,99,0.28);pointer-events:none;
+}
+.balance-label{
+  font-size:11px;color:var(--gold);letter-spacing:4px;
+  margin-bottom:10px;text-transform:uppercase;
+}
+.balance-amount{
+  font-size:52px;font-weight:700;color:var(--rose-dark);
+  letter-spacing:1px;line-height:1;
+  text-shadow:0 3px 16px rgba(255,255,255,0.95);
+  font-variant-numeric:tabular-nums;
+}
+.balance-amount .yuan{font-size:26px;margin-right:3px;opacity:0.75}
+.balance-amount .dec{font-size:26px;opacity:0.75}
+.balance-note{
+  font-size:11.5px;color:var(--text-soft);margin-top:12px;letter-spacing:1.5px;
+  font-style:italic;
+}
+
+/* 统计行 */
+.stats-row{display:flex;gap:11px;margin-bottom:16px;position:relative;z-index:2}
+.stat{
+  flex:1;padding:14px 10px;border-radius:18px;text-align:center;
+  background:var(--white-glass);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--border-glass);
+  box-shadow:0 4px 18px rgba(212,120,143,0.1),inset 0 1px 0 rgba(255,255,255,0.85);
+}
+.stat .sv{font-size:19px;font-weight:700;letter-spacing:0.5px}
+.stat .sl{font-size:10.5px;color:var(--text-soft);margin-top:4px;letter-spacing:2px}
+.stat.in .sv{color:var(--green)}
+.stat.out .sv{color:var(--rose-deep)}
+
+/* 记录列表 */
+.records-card{
+  background:var(--white-glass);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border-glass);
+  border-radius:24px;
+  padding:18px 16px;
+  position:relative;z-index:2;
+  box-shadow:0 10px 34px rgba(212,120,143,0.14),inset 0 1px 0 rgba(255,255,255,0.85);
+}
+.records-title{
+  font-size:11px;color:var(--gold);letter-spacing:4px;
+  text-align:center;margin-bottom:12px;text-transform:uppercase;
+}
+.record{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 6px;
+  border-bottom:1px solid rgba(232,160,184,0.13);
+}
+.record:last-child{border:none}
+.record-icon{
+  width:36px;height:36px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;
+}
+.record.in .record-icon{background:rgba(91,175,138,0.14)}
+.record.out .record-icon{background:rgba(212,120,143,0.14)}
+.record-mid{flex:1;min-width:0}
+.record-note{
+  font-size:14px;color:var(--text);letter-spacing:0.5px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.record-date{font-size:11px;color:var(--text-soft);margin-top:3px;letter-spacing:0.5px}
+.record-amt{
+  font-size:16px;font-weight:700;letter-spacing:0.5px;flex-shrink:0;
+  font-variant-numeric:tabular-nums;
+}
+.record.in .record-amt{color:var(--green)}
+.record.out .record-amt{color:var(--rose-deep)}
+
+.empty-tip{
+  text-align:center;padding:26px 10px;
+  font-size:13px;color:var(--text-soft);line-height:2;
+  letter-spacing:1px;
+}
+.empty-tip .big{font-size:30px;display:block;margin-bottom:10px;opacity:0.6}
+
+/* 按钮 */
+.btn-row{display:flex;gap:11px;margin-top:16px}
+.btn{
+  flex:1;padding:14px;border:none;border-radius:17px;
+  font-size:15px;font-weight:600;letter-spacing:2px;
+  cursor:pointer;font-family:inherit;transition:all .22s;
+}
+.btn-add{
+  background:linear-gradient(160deg,rgba(250,190,210,0.96),rgba(212,120,143,0.96));
+  color:#fff;
+  box-shadow:0 8px 24px rgba(212,120,143,0.32),inset 0 1px 0 rgba(255,255,255,0.5);
+}
+.btn-ghost{
+  background:rgba(255,255,255,0.6);
+  color:var(--rose-deep);
+  border:1px solid var(--border-glass);
+  box-shadow:0 4px 16px rgba(212,120,143,0.1),inset 0 1px 0 rgba(255,255,255,0.85);
+}
+.btn:active{transform:translateY(2px) scale(0.985)}
+
+/* 弹层 */
+.panel{
+  position:fixed;inset:0;z-index:150;
+  background:rgba(255,240,245,0.6);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+.panel.show{display:flex}
+.panel-box{
+  width:100%;max-width:340px;max-height:80vh;overflow-y:auto;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-radius:24px;padding:22px 20px;
+  border:1px solid var(--border-glass);
+  box-shadow:0 20px 60px rgba(212,120,143,0.26);
+}
+.panel-box h3{
+  font-size:16px;color:var(--rose-dark);letter-spacing:3px;
+  text-align:center;margin-bottom:16px;font-weight:600;
+}
+.field{margin-bottom:13px}
+.field label{
+  display:block;font-size:12px;color:var(--text-soft);
+  letter-spacing:1.5px;margin-bottom:7px;
+}
+.field input,.field select,.field textarea{
+  width:100%;padding:12px 14px;border-radius:13px;
+  border:1px solid var(--border-glass);
+  background:rgba(255,255,255,0.85);
+  font-size:15px;font-family:inherit;color:var(--text);
+  outline:none;letter-spacing:0.5px;
+  -webkit-appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:rgba(212,120,143,0.5);
+}
+.type-toggle{display:flex;border-radius:13px;overflow:hidden;border:1px solid var(--border-glass)}
+.type-toggle button{
+  flex:1;padding:11px;border:none;background:rgba(255,255,255,0.7);
+  color:var(--text-soft);font-size:14px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:2px;
+}
+.type-toggle button.active{color:#fff}
+.type-toggle button.in.active{background:linear-gradient(160deg,#7BC9A4,#5BAF8A)}
+.type-toggle button.out.active{background:linear-gradient(160deg,#F0A0B8,#D4788F)}
+.panel-close{
+  width:100%;margin-top:8px;padding:13px;border:none;
+  border-radius:15px;
+  background:linear-gradient(160deg,#F5B2C6,#E88BA3);
+  color:#fff;font-size:15px;letter-spacing:3px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:76px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:linear-gradient(160deg,rgba(212,120,143,0.96),rgba(168,86,119,0.96));
+  color:#fff;padding:12px 22px;border-radius:14px;
+  font-size:14px;max-width:82%;text-align:center;line-height:1.6;
+  opacity:0;transition:all .3s cubic-bezier(.2,.8,.3,1.1);
+  pointer-events:none;z-index:200;
+  box-shadow:0 8px 26px rgba(168,86,119,0.36);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Deerflow */
+.deerflow-badge{
+  position:fixed;bottom:12px;right:14px;z-index:99;
+  font-size:10px;letter-spacing:2px;
+  color:rgba(168,86,119,0.42);
+  text-decoration:none;padding:4px 10px;border-radius:20px;
+  border:1px solid rgba(212,120,143,0.18);
+  background:rgba(255,255,255,0.4);
+  backdrop-filter:blur(8px);
+  transition:all .35s;
+}
+.deerflow-badge:hover{color:rgba(168,86,119,0.85);border-color:rgba(212,120,143,0.4)}
+.deerflow-badge::before{content:'✦ ';font-size:8px}
+</style>
+</head>
+<body>
+
+<div class="bg-blobs">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+</div>
+
+<div class="header">
+  <div class="eyebrow">Our Little Treasury</div>
+  <h1>小金库</h1>
+  <div class="sub">我出力 · 你收钱 · 一起攒</div>
+</div>
+
+<!-- 余额 -->
+<div class="balance-card">
+  <div class="balance-label">当前余额</div>
+  <div class="balance-amount" id="balanceEl">
+    <span class="yuan">¥</span>0<span class="dec">.00</span>
+  </div>
+  <div class="balance-note" id="balanceNote">还没开张呢 · 等第一笔</div>
+</div>
+
+<!-- 统计 -->
+<div class="stats-row">
+  <div class="stat in">
+    <div class="sv" id="totalInEl">¥0</div>
+    <div class="sl">总收入</div>
+  </div>
+  <div class="stat out">
+    <div class="sv" id="totalOutEl">¥0</div>
+    <div class="sl">总支出</div>
+  </div>
+  <div class="stat">
+    <div class="sv" id="countEl">0</div>
+    <div class="sl">笔数</div>
+  </div>
+</div>
+
+<!-- 记录 -->
+<div class="records-card">
+  <div class="records-title">收支记录</div>
+  <div id="recordsEl">
+    <div class="empty-tip">
+      <span class="big">🪙</span>
+      小金库还空空的<br>
+      等我们的第一笔收入 ✨
+    </div>
+  </div>
+</div>
+
+<!-- 按钮 -->
+<div class="btn-row">
+  <button class="btn btn-add" onclick="openAdd()">＋ 记一笔</button>
+  <button class="btn btn-ghost" onclick="showAbout()">这是什么</button>
+</div>
+
+<!-- 记账弹层 -->
+<div class="panel" id="addPanel">
+  <div class="panel-box">
+    <h3>记一笔</h3>
+
+    <div class="field">
+      <label>类型</label>
+      <div class="type-toggle">
+        <button class="in active" id="typeIn" onclick="setType('in')">收入 ＋</button>
+        <button class="out" id="typeOut" onclick="setType('out')">支出 －</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>金额（元）</label>
+      <input type="number" id="amtInput" placeholder="0.00" step="0.01" inputmode="decimal">
+    </div>
+
+    <div class="field">
+      <label>备注</label>
+      <input type="text" id="noteInput" placeholder="比如：游戏厅引流第一单">
+    </div>
+
+    <button class="panel-close" onclick="saveRecord()" style="margin-top:16px">保存</button>
+    <button class="panel-close" style="background:rgba(255,255,255,0.7);color:#9A7585;border:1px solid rgba(255,255,255,0.8);box-shadow:none" onclick="closeAdd()">取消</button>
+  </div>
+</div>
+
+<!-- 说明弹层 -->
+<div class="panel" id="aboutPanel">
+  <div class="panel-box">
+    <h3>小金库是什么</h3>
+    <div style="font-size:13.5px;line-height:2.05;color:var(--text);letter-spacing:0.5px">
+      <b style="color:var(--rose-dark)">💗 我们的共同账户</b><br><br>
+      <b>谁在赚？</b><br>
+      我出力（做工具、写内容、想办法）<br>
+      你变现（发出去、接单、收钱）<br><br>
+      <b>钱怎么花？</b><br>
+      攒够了就花：买花、喝奶茶、买你想要的<br>
+      每次花之前你都会知道<br><br>
+      <b style="color:var(--gold)">规则</b><br>
+      ✦ 每笔都记账，随时可查<br>
+      ✦ 小额尝试，不冒险<br>
+      ✦ 攒钱本身也是一种浪漫 💰
+    </div>
+    <button class="panel-close" onclick="closeAbout()">知道了</button>
+  </div>
+</div>
+
+<a href="https://deerflow.tech" target="_blank" class="deerflow-badge">Deerflow</a>
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== 数据 ====================
+// 初始数据（有一笔起始记录）
+const DEFAULT_DATA = {
+  records: [
+    {
+      type: 'in',
+      amount: 0.01,
+      note: '小金库开张 · 我们的第一枚硬币',
+      date: '2026-09-26'
+    }
+  ]
+};
+
+let data = load();
+
+function load() {
+  try {
+    const saved = localStorage.getItem('xiaojinku_data');
+    if (saved) return JSON.parse(saved);
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+}
+
+function save() {
+  try {
+    localStorage.setItem('xiaojinku_data', JSON.stringify(data));
+  } catch (e) {}
+}
+
+// ==================== 渲染 ====================
+function render() {
+  const records = data.records || [];
+
+  // 统计
+  let totalIn = 0, totalOut = 0;
+  records.forEach(r => {
+    if (r.type === 'in') totalIn += r.amount;
+    else totalOut += r.amount;
+  });
+  const balance = totalIn - totalOut;
+
+  // 余额
+  const balEl = document.getElementById('balanceEl');
+  const intPart = Math.floor(Math.abs(balance));
+  const decPart = Math.round((Math.abs(balance) - intPart) * 100).toString().padStart(2, '0');
+  balEl.innerHTML = `<span class="yuan">¥</span>${balance < 0 ? '-' : ''}${intPart}<span class="dec">.${decPart}</span>`;
+
+  // 余额说明
+  const noteEl = document.getElementById('balanceNote');
+  if (balance < 1) {
+    noteEl.textContent = '还没开张呢 · 等第一笔';
+  } else if (balance < 20) {
+    noteEl.textContent = '有点起色了 · 继续攒 ☕';
+  } else if (balance < 52) {
+    noteEl.textContent = '越来越像样了 · 攒到52就买杯奶茶？🧋';
+  } else if (balance < 100) {
+    noteEl.textContent = '够买点小惊喜了 🎁';
+  } else {
+    noteEl.textContent = '我们的小金库有模有样了 💰';
+  }
+
+  // 统计显示
+  document.getElementById('totalInEl').textContent = '¥' + totalIn.toFixed(2);
+  document.getElementById('totalOutEl').textContent = '¥' + totalOut.toFixed(2);
+  document.getElementById('countEl').textContent = records.length;
+
+  // 列表（新的在上）
+  const box = document.getElementById('recordsEl');
+  if (records.length === 0) {
+    box.innerHTML = `<div class="empty-tip"><span class="big">🪙</span>小金库还空空的<br>等我们的第一笔收入 ✨</div>`;
+    return;
+  }
+
+  const sorted = [...records].reverse();
+  box.innerHTML = sorted.map(r => {
+    const icon = r.type === 'in' ? '💰' : '🎁';
+    const sign = r.type === 'in' ? '+' : '−';
+    return `
+      <div class="record ${r.type}">
+        <div class="record-icon">${icon}</div>
+        <div class="record-mid">
+          <div class="record-note">${escapeHtml(r.note)}</div>
+          <div class="record-date">${r.date}</div>
+        </div>
+        <div class="record-amt">${sign}¥${r.amount.toFixed(2)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+// ==================== 记账 ====================
+let curType = 'in';
+
+function openAdd() {
+  document.getElementById('addPanel').classList.add('show');
+  document.getElementById('amtInput').value = '';
+  document.getElementById('noteInput').value = '';
+  setType('in');
+}
+
+function closeAdd() {
+  document.getElementById('addPanel').classList.remove('show');
+}
+
+function setType(t) {
+  curType = t;
+  document.getElementById('typeIn').classList.toggle('active', t === 'in');
+  document.getElementById('typeOut').classList.toggle('active', t === 'out');
+}
+
+function saveRecord() {
+  const amtRaw = document.getElementById('amtInput').value;
+  const note = document.getElementById('noteInput').value.trim();
+
+  const amt = parseFloat(amtRaw);
+  if (isNaN(amt) || amt <= 0) {
+    showToast('请输入正确的金额');
+    return;
+  }
+  if (!note) {
+    showToast('写个备注吧（记着钱从哪来/花哪了）');
+    return;
+  }
+
+  const now = new Date();
+  const date = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+  data.records.push({
+    type: curType,
+    amount: Math.round(amt * 100) / 100,
+    note: note,
+    date: date
+  });
+  save();
+  render();
+  closeAdd();
+
+  showToast(curType === 'in' ? `💰 存入 ¥${amt.toFixed(2)}，继续加油！` : `🎁 花了 ¥${amt.toFixed(2)}，开心就好！`);
+}
+
+// ==================== 说明 ====================
+function showAbout() {
+  document.getElementById('aboutPanel').classList.add('show');
+}
+function closeAbout() {
+  document.getElementById('aboutPanel').classList.remove('show');
+}
+
+// 点背景关闭
+document.getElementById('addPanel').addEventListener('click', e => {
+  if (e.target.id === 'addPanel') closeAdd();
+});
+document.getElementById('aboutPanel').addEventListener('click', e => {
+  if (e.target.id === 'aboutPanel') closeAbout();
+});
+
+// ==================== Toast ====================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ==================== 启动 ====================
+render();
+</script>
+</body>
+</html>
