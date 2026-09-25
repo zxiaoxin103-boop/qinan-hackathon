@@ -105,6 +105,11 @@ body::before{
     radial-gradient(ellipse 90% 70% at 20% 15%, rgba(255,255,255,0.24), transparent 60%),
     linear-gradient(150deg, #FFB8B0 0%, #E8756A 58%, #C85A52 100%);
 }
+.tile-drink{
+  background:
+    radial-gradient(ellipse 90% 70% at 20% 15%, rgba(255,255,255,0.20), transparent 60%),
+    linear-gradient(150deg, #D18BA8 0%, #A85677 58%, #8A3D5C 100%);
+}
 
 /* 卡片内装饰 */
 .game-tile::before{
@@ -183,6 +188,17 @@ body::before{
 </div>
 
 <div class="game-list">
+  <a href="drink.html" class="game-tile tile-drink">
+    <div class="tile-inner">
+      <div class="tile-icon">🍺</div>
+      <div class="tile-text">
+        <div class="tile-title">今天谁喝酒</div>
+        <div class="tile-desc">50条规则 · 转盘选人 · 谁中谁喝</div>
+      </div>
+      <div class="tile-arrow">›</div>
+    </div>
+  </a>
+
   <a href="bomb.html" class="game-tile tile-bomb">
     <div class="tile-inner">
       <div class="tile-icon">💣</div>

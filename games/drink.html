@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>今天谁喝酒</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#FFF0F5">
+<style>
+:root{
+  --rose:#F2A2B5;
+  --rose-soft:#FAD4E0;
+  --rose-deep:#D4788F;
+  --rose-dark:#A85677;
+  --violet:#B69ADD;
+  --violet-deep:#8E6BC4;
+  --cream:#FFF8FA;
+  --text:#5A3D4A;
+  --text-soft:#9A7585;
+  --white-glass:rgba(255,255,255,0.42);
+  --border-glass:rgba(255,255,255,0.7);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;
+  min-height:100vh;
+  padding:20px 16px 40px;
+  -webkit-user-select:none;user-select:none;
+  overflow-x:hidden;
+  color:var(--text);
+  position:relative;
+  background:#FFF0F5;
+  display:flex;flex-direction:column;
+}
+
+.bg-blobs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:0.7}
+.blob.b1{width:340px;height:340px;background:radial-gradient(circle,#FFC5D8,transparent 70%);top:-90px;left:-80px}
+.blob.b2{width:300px;height:300px;background:radial-gradient(circle,#E0CCF5,transparent 70%);top:24%;right:-110px}
+.blob.b3{width:320px;height:320px;background:radial-gradient(circle,#FFE0EC,transparent 70%);bottom:-70px;left:-50px}
+.blob.b4{width:240px;height:240px;background:radial-gradient(circle,#FFD9C0,transparent 70%);bottom:18%;right:-70px}
+
+/* ===== 标题 ===== */
+.header{text-align:center;margin-bottom:16px;position:relative;z-index:2;padding-top:4px}
+.header h1{
+  font-size:24px;letter-spacing:6px;font-weight:600;
+  color:var(--rose-dark);
+  text-shadow:0 2px 14px rgba(255,255,255,0.9);
+}
+.header .sub{
+  font-size:11px;color:var(--text-soft);letter-spacing:3px;margin-top:7px;
+  text-shadow:0 1px 8px rgba(255,255,255,0.9);
+}
+
+/* ===== 结果展示 ===== */
+.result-card{
+  background:var(--white-glass);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border-glass);
+  border-radius:24px;
+  padding:18px 20px;
+  margin-bottom:16px;
+  text-align:center;
+  position:relative;z-index:2;
+  box-shadow:0 10px 34px rgba(212,120,143,0.16),inset 0 1px 0 rgba(255,255,255,0.85);
+  min-height:104px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.result-card::before{
+  content:'';position:absolute;inset:10px;border-radius:16px;
+  border:1.5px dashed rgba(212,120,143,0.2);pointer-events:none;
+}
+.result-num{
+  font-size:13px;color:var(--rose-deep);font-weight:600;
+  letter-spacing:2px;margin-bottom:6px;
+  opacity:0;transition:opacity .3s;
+}
+.result-num.show{opacity:1}
+.result-text{
+  font-size:21px;line-height:1.6;color:var(--rose-dark);
+  font-weight:600;letter-spacing:2px;
+  text-shadow:0 2px 10px rgba(255,255,255,0.9);
+}
+.result-text.idle{font-size:15px;font-weight:500;color:var(--text-soft);letter-spacing:3px}
+@keyframes resultPop{
+  0%{opacity:0;transform:scale(0.82)}
+  60%{transform:scale(1.06)}
+  100%{opacity:1;transform:scale(1)}
+}
+.result-text.pop{animation:resultPop .5s cubic-bezier(.2,.9,.3,1.2)}
+
+/* ===== 转盘 ===== */
+.wheel-wrap{
+  position:relative;
+  width:min(82vw,320px);height:min(82vw,320px);
+  margin:0 auto 18px;
+  z-index:2;
+}
+
+.wheel-pointer{
+  position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  width:0;height:0;
+  border-left:14px solid transparent;
+  border-right:14px solid transparent;
+  border-top:26px solid var(--rose-dark);
+  filter:drop-shadow(0 4px 10px rgba(168,86,119,0.5));
+  z-index:5;
+}
+
+.wheel{
+  width:100%;height:100%;border-radius:50%;
+  position:relative;
+  transition:transform 5s cubic-bezier(.15,.62,.15,1);
+  box-shadow:
+    0 16px 44px rgba(212,120,143,0.3),
+    inset 0 0 0 9px rgba(255,255,255,0.9),
+    inset 0 0 0 11px rgba(212,120,143,0.16);
+  overflow:hidden;
+}
+
+.wheel-hub{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:76px;height:76px;border-radius:50%;
+  background:linear-gradient(160deg,#FFFFFF,#FFE8F0);
+  box-shadow:0 6px 22px rgba(212,120,143,0.32),inset 0 1px 0 rgba(255,255,255,1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--rose-dark);
+  letter-spacing:2px;z-index:4;
+  border:2px solid rgba(255,255,255,0.95);
+}
+
+/* 转盘上的编号 */
+.wheel-num{
+  position:absolute;
+  top:50%;left:50%;
+  transform-origin:center center;
+  font-size:9px;font-weight:600;color:rgba(255,255,255,0.92);
+  text-shadow:0 1px 2px rgba(140,60,90,0.5);
+  pointer-events:none;
+  transition:opacity .3s;
+}
+
+/* ===== 旋转按钮 ===== */
+.spin-btn{
+  width:100%;max-width:320px;
+  margin:0 auto;
+  padding:17px;border:none;border-radius:20px;
+  background:linear-gradient(160deg,rgba(250,190,210,0.96),rgba(212,120,143,0.96));
+  color:#fff;font-size:18px;font-weight:700;letter-spacing:5px;
+  cursor:pointer;font-family:inherit;
+  box-shadow:0 10px 30px rgba(212,120,143,0.36),inset 0 1px 0 rgba(255,255,255,0.55);
+  transition:all .22s;
+  position:relative;z-index:2;
+}
+.spin-btn:active{transform:translateY(2px) scale(0.985)}
+.spin-btn:disabled{opacity:0.55}
+
+.footer-note{
+  text-align:center;font-size:11px;color:var(--text-soft);
+  letter-spacing:2px;margin-top:16px;
+  position:relative;z-index:2;
+}
+
+/* ===== 详情浮层（看全部规则）===== */
+.panel{
+  position:fixed;inset:0;z-index:150;
+  background:rgba(255,240,245,0.55);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+.panel.show{display:flex}
+.panel-box{
+  width:100%;max-width:360px;max-height:78vh;overflow-y:auto;
+  background:rgba(255,255,255,0.78);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-radius:24px;padding:22px 20px;
+  border:1px solid var(--border-glass);
+  box-shadow:0 20px 60px rgba(212,120,143,0.24);
+}
+.panel-box h3{
+  font-size:16px;color:var(--rose-dark);letter-spacing:3px;
+  text-align:center;margin-bottom:14px;font-weight:600;
+}
+.rule-item{
+  display:flex;gap:10px;padding:9px 8px;
+  border-bottom:1px solid rgba(232,160,184,0.14);
+  font-size:13.5px;line-height:1.6;color:var(--text);
+}
+.rule-item:last-child{border:none}
+.rule-item .rn{
+  color:var(--rose-deep);font-weight:700;font-size:12px;
+  min-width:22px;text-align:right;
+}
+.panel-close{
+  width:100%;margin-top:16px;padding:13px;border:none;
+  border-radius:15px;
+  background:linear-gradient(160deg,#F5B2C6,#E88BA3);
+  color:#fff;font-size:15px;letter-spacing:3px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+}
+
+/* ===== Deerflow ===== */
+.deerflow-badge{
+  position:fixed;bottom:12px;right:14px;z-index:99;
+  font-size:10px;letter-spacing:2px;
+  color:rgba(168,86,119,0.42);
+  text-decoration:none;padding:4px 10px;border-radius:20px;
+  border:1px solid rgba(212,120,143,0.18);
+  background:rgba(255,255,255,0.4);
+  backdrop-filter:blur(8px);
+  transition:all .35s;
+}
+.deerflow-badge:hover{color:rgba(168,86,119,0.85);border-color:rgba(212,120,143,0.4)}
+.deerflow-badge::before{content:'✦ ';font-size:8px}
+</style>
+</head>
+<body>
+
+<div class="bg-blobs">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+</div>
+
+<div class="header">
+  <h1>今天谁喝酒</h1>
+  <div class="sub">转一下 · 谁中谁喝</div>
+</div>
+
+<!-- 结果展示 -->
+<div class="result-card">
+  <div class="result-num" id="resultNum"></div>
+  <div class="result-text idle" id="resultText">点击下方按钮开始</div>
+</div>
+
+<!-- 转盘 -->
+<div class="wheel-wrap">
+  <div class="wheel-pointer"></div>
+  <div class="wheel" id="wheel"></div>
+  <div class="wheel-hub">喝 🍺</div>
+</div>
+
+<button class="spin-btn" id="spinBtn" onclick="spin()">转 ！</button>
+
+<div class="footer-note">
+  <span onclick="showRules()" style="text-decoration:underline;cursor:pointer">查看全部 50 条规则</span>
+</div>
+
+<!-- 规则列表浮层 -->
+<div class="panel" id="panel">
+  <div class="panel-box">
+    <h3>全部规则</h3>
+    <div id="ruleList"></div>
+    <button class="panel-close" onclick="hideRules()">知道了</button>
+  </div>
+</div>
+
+<a href="https://deerflow.tech" target="_blank" class="deerflow-badge">Deerflow</a>
+
+<script>
+// ==================== 50条规则 ====================
+// 前36条：来自小红书视频（颂宜）原版
+// 后14条：补充设计（同风格）
+const RULES = [
+  '穿白衣服的喝',
+  '现在有喜欢的人喝',
+  '分手时间不超过3个月的喝',
+  '喜欢看短剧的喝',
+  '手机电量高于80%的喝',
+  '最近通话记录超过1小时的喝',
+  '最爱恋爱钓鱼的喝',
+  '手机里照片少于100张的喝',
+  '正在使用iPhone的喝',
+  '为了前任经常放朋友鸽子的喝',
+  '打开手机一个App，其他人没有的喝',
+  '单身狗喝',
+  '有对象的喝',
+  '手机屏保是自己照片的喝',
+  '谈过3次以上恋爱的喝',
+  '初恋还在身边的喝',
+  '甩过别人的喝',
+  '没被前任主动公开过的喝',
+  '相信一见钟情的喝',
+  '相信日久生情的喝',
+  '和前任的朋友谈过恋爱的喝',
+  '收到过前任求复合信息的喝',
+  '不抽烟的喝',
+  '主动提供分手又后悔的喝',
+  '单身的喝',
+  '戴戒指的喝',
+  '没化妆的喝',
+  '和左边第二个人喝交杯酒',
+  '打开美团搜byt，有购买记录的喝',
+  '刚才笑最大声的喝',
+  '打开抖音刷10条，一条异性喝一杯',
+  '坐在你左边的人喝',
+  '坐在你右边的人喝',
+  '坐在你对面的人喝',
+  '给任意一个人打电话，5秒没接的喝',
+  '到现在没喝过的人喝',
+  // ↓ 补充设计
+  '今天穿牛仔裤的喝',
+  '戴手表的喝',
+  '涂了口红的喝',
+  '头发扎起来的喝',
+  '微信步数不到5000的喝',
+  '手机壳是透明或纯色的喝',
+  '最近一周没发朋友圈的喝',
+  '手机里游戏App超过3个的喝',
+  '微信置顶超过3个人的喝',
+  '最近删过聊天记录的喝',
+  '今天笑得最少的人喝',
+  '手机放在桌上的喝',
+  '现在说话最少的人喝',
+  '被前任拉黑过的喝'
+];
+
+const N = RULES.length; // 50
+const SEG = 360 / N;
+let rotation = 0;
+let spinning = false;
+let lastIdx = -1;
+
+// ==================== 音效 ====================
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// 转动中的"哒哒"声
+function playTick(vol = 0.1) {
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.value = 1200 + Math.random() * 400;
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(t); osc.stop(t + 0.06);
+}
+
+// 停止音（叮）
+function playDing() {
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  [784, 1046, 1318].forEach((f, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = f;
+    gain.gain.setValueAtTime(0.001, t + i * 0.09);
+    gain.gain.linearRampToValueAtTime(0.14, t + i * 0.09 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.09 + 0.5);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t + i * 0.09); osc.stop(t + i * 0.09 + 0.55);
+  });
+}
+
+// ==================== 构建转盘 ====================
+const COLORS = ['#F2A2B5', '#C9A6E0', '#FAD4E0', '#B69ADD'];
+
+function buildWheel() {
+  const wheel = document.getElementById('wheel');
+
+  // 55度渐变扇区
+  let stops = [];
+  for (let i = 0; i < N; i++) {
+    const c = COLORS[i % COLORS.length];
+    stops.push(`${c} ${i * SEG}deg ${(i + 1) * SEG}deg`);
+  }
+  wheel.style.background = `conic-gradient(${stops.join(',')})`;
+
+  // 编号标签
+  wheel.querySelectorAll('.wheel-num').forEach(el => el.remove());
+  for (let i = 0; i < N; i++) {
+    const label = document.createElement('div');
+    label.className = 'wheel-num';
+    const angle = i * SEG + SEG / 2;
+    label.textContent = (i + 1);
+    label.style.transform = `translate(-50%,-50%) rotate(${angle}deg) translateY(-128px)`;
+    label.dataset.idx = i;
+    wheel.appendChild(label);
+  }
+}
+
+// ==================== 旋转 ====================
+function spin() {
+  if (spinning) return;
+  spinning = true;
+  document.getElementById('spinBtn').disabled = true;
+
+  const wheel = document.getElementById('wheel');
+  const resultNum = document.getElementById('resultNum');
+  const resultText = document.getElementById('resultText');
+
+  // 清除旧结果
+  resultNum.classList.remove('show');
+  resultText.classList.add('idle');
+  resultText.textContent = '转啊转…';
+
+  // 避免连续同一个
+  let targetIdx;
+  let guard = 0;
+  do {
+    targetIdx = Math.floor(Math.random() * N);
+    guard++;
+  } while (targetIdx === lastIdx && guard < 30);
+  lastIdx = targetIdx;
+
+  // 计算旋转角度（让targetIdx的扇区中线对准顶部指针）
+  const angleMid = targetIdx * SEG + SEG / 2;
+  const currentMod = ((rotation % 360) + 360) % 360;
+  const targetMod = ((360 - angleMid) % 360 + 360) % 360;
+  let delta = targetMod - currentMod;
+  if (delta < 0) delta += 360;
+
+  rotation += 360 * 6 + delta;
+  wheel.style.transform = `rotate(${rotation}deg)`;
+
+  // 转动音效（前3秒密集，之后稀疏）
+  const ctx = getAudioCtx();
+  let tickCount = 0;
+  const tickTimer = setInterval(() => {
+    tickCount++;
+    if (tickCount > 28) { clearInterval(tickTimer); return; }
+    // 越往后越慢
+    const slowdown = tickCount > 18 ? 3 : (tickCount > 12 ? 2 : 1);
+    if (tickCount % slowdown === 0) playTick(0.06 + Math.random() * 0.06);
+  }, 160);
+
+  // 结果显示（5秒动画结束后）
+  setTimeout(() => {
+    clearInterval(tickTimer);
+    playDing();
+
+    resultNum.textContent = `第 ${targetIdx + 1} 条`;
+    resultNum.classList.add('show');
+    resultText.classList.remove('idle');
+    resultText.textContent = RULES[targetIdx];
+    void resultText.offsetWidth;
+    resultText.classList.add('pop');
+
+    if (navigator.vibrate) navigator.vibrate(80);
+
+    spinning = false;
+    document.getElementById('spinBtn').disabled = false;
+  }, 5200);
+}
+
+// ==================== 规则列表 ====================
+function showRules() {
+  const box = document.getElementById('ruleList');
+  box.innerHTML = RULES.map((r, i) =>
+    `<div class="rule-item"><span class="rn">${i + 1}.</span><span>${r}</span></div>`
+  ).join('');
+  document.getElementById('panel').classList.add('show');
+}
+function hideRules() {
+  document.getElementById('panel').classList.remove('show');
+}
+document.getElementById('panel').addEventListener('click', e => {
+  if (e.target.id === 'panel') hideRules();
+});
+
+// ==================== 初始化 ====================
+buildWheel();
+</script>
+</body>
+</html>
