@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=2.0,user-scalable=no">
+<title>大话骰 · 沙龙</title>
+<style>
+:root{
+  --cream:#FDF8F5;
+  --blush:#F7E9EE;
+  --rose:#E8A0B8;
+  --rose-soft:#F2C4D4;
+  --rose-deep:#C4708E;
+  --rose-dark:#8E4A63;
+  --gold:#C9A063;
+  --gold-light:#E3C88F;
+  --charcoal:#3D2B33;
+  --muted:#A8899A;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, #FBE8EF 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 100% 100%, #F5E0E8 0%, transparent 50%),
+    linear-gradient(170deg, #FDF8F5 0%, #FAF0F4 100%);
+  font-family: Georgia, 'Songti SC', 'Noto Serif SC', 'STSong', serif;
+  min-height:100vh;
+  padding:20px 16px 40px;
+  -webkit-user-select:none;user-select:none;
+  overflow-x:hidden;
+  color:var(--charcoal);
+  position:relative;
+}
+
+/* 丝绒纹理 */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.35;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(232,160,184,0.03) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(-45deg, rgba(201,160,99,0.02) 0 1px, transparent 1px 3px);
+}
+
+/* 金色弧线装饰 */
+body::after{
+  content:'';position:fixed;width:420px;height:420px;border-radius:50%;
+  border:1px solid rgba(201,160,99,0.18);
+  top:-140px;right:-140px;pointer-events:none;z-index:0;
+}
+.deco-arc{
+  position:fixed;width:260px;height:260px;border-radius:50%;
+  border:1px solid rgba(201,160,99,0.12);
+  bottom:-90px;left:-90px;pointer-events:none;z-index:0;
+}
+
+/* ===== 标题 ===== */
+.header{text-align:center;margin-bottom:20px;position:relative;z-index:1}
+.header .eyebrow{
+  font-size:10px;letter-spacing:4px;color:var(--gold);
+  text-transform:uppercase;margin-bottom:8px;font-family:Georgia,serif;
+}
+.header h1{
+  font-size:27px;color:var(--charcoal);font-weight:400;
+  letter-spacing:6px;
+  background:linear-gradient(135deg, var(--rose-dark), var(--rose-deep) 50%, var(--rose-dark));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.header .rule{
+  display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;
+}
+.header .rule .line{height:1px;width:44px;background:linear-gradient(90deg,transparent,var(--gold-light))}
+.header .rule .line:last-child{background:linear-gradient(90deg,var(--gold-light),transparent)}
+.header .rule span{font-size:11px;color:var(--muted);letter-spacing:2px}
+
+/* ===== 卡片 ===== */
+.card{
+  background:rgba(255,255,255,0.7);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-radius:20px;
+  padding:18px 16px;
+  margin-bottom:14px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 8px 32px rgba(196,112,142,0.10),
+    0 2px 6px rgba(196,112,142,0.06);
+  border:1px solid rgba(255,255,255,0.8);
+  position:relative;z-index:1;
+}
+
+.label{
+  font-size:11px;color:var(--gold);letter-spacing:3px;
+  text-align:center;margin-bottom:10px;text-transform:uppercase;
+}
+
+/* ===== 摇骰区 ===== */
+.shaker-area{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:220px;position:relative;touch-action:none;
+}
+
+.shaker-scene{perspective:900px;width:100%;height:170px;display:flex;align-items:center;justify-content:center;position:relative}
+
+/* 台面（骰盅下的绒布） */
+.table-mat{
+  position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
+  width:150px;height:34px;border-radius:50%;
+  background:radial-gradient(ellipse, rgba(196,112,142,0.16), rgba(196,112,142,0.04) 60%, transparent 75%);
+  filter:blur(2px);
+}
+
+/* ===== 立体骰盅 ===== */
+.shaker{
+  width:112px;height:126px;
+  position:absolute;
+  left:50%;top:50%;
+  margin-left:-56px;margin-top:-63px;
+  transform-style:preserve-3d;
+  transition:transform .35s ease,opacity .4s ease;
+  cursor:grab;
+}
+.shaker:active{cursor:grabbing}
+
+/* 盅身 —— 一体成型的圆拱形 */
+.shaker-body{
+  position:absolute;inset:0;
+  border-radius:54px 54px 16px 16px;
+  background:
+    radial-gradient(ellipse 72% 46% at 50% 6%, rgba(255,255,255,0.50), transparent 62%),
+    linear-gradient(90deg,
+      #C98BA4 0%,
+      #DA9DB4 16%,
+      #E8B0C6 38%,
+      #EDBCCF 50%,
+      #E4A8BF 64%,
+      #D18EA8 86%,
+      #C47F98 100%);
+  box-shadow:
+    inset -5px 0 14px rgba(150,80,105,0.10),
+    inset 5px 0 12px rgba(255,255,255,0.16),
+    0 12px 26px rgba(160,90,115,0.16),
+    0 3px 8px rgba(160,90,115,0.10);
+  overflow:hidden;
+}
+/* 盅身左侧柔光 */
+.shaker-body::before{
+  content:'';position:absolute;top:34px;left:22px;width:11px;height:48px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.06) 78%, transparent);
+  border-radius:8px;filter:blur(4px);transform:rotate(-3deg);
+}
+/* 右侧微光 */
+.shaker-body::after{
+  content:'';position:absolute;top:42px;right:15px;width:5px;height:32px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.20), transparent);
+  border-radius:4px;filter:blur(3px);
+}
+
+/* 盅底（顶面椭圆）— 柔和 */
+.shaker-top{
+  position:absolute;top:-8px;left:0;right:0;height:24px;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at 40% 36%, #EFC5D5 0%, #E0A9C0 42%, #CE92AC 75%, #BE7F9B 100%);
+  box-shadow:
+    inset 0 -3px 7px rgba(150,80,105,0.16),
+    inset 0 2px 5px rgba(255,255,255,0.32),
+    0 2px 5px rgba(160,90,115,0.14);
+  z-index:3;
+}
+/* 桌面投影 */
+.shaker-bottom{
+  position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
+  width:104px;height:20px;border-radius:50%;
+  background:radial-gradient(ellipse, rgba(150,85,110,0.20), rgba(160,90,115,0.05) 62%, transparent 78%);
+  filter:blur(4px);
+  z-index:0;
+}
+/* 金色腰线 — 柔化 */
+.shaker-band{
+  position:absolute;left:5px;right:5px;top:74px;height:2px;
+  background:linear-gradient(90deg,
+    rgba(201,160,99,0.12),
+    rgba(214,178,120,0.55) 32%,
+    rgba(228,200,150,0.62) 50%,
+    rgba(214,178,120,0.52) 68%,
+    rgba(201,160,99,0.12));
+  border-radius:2px;
+  z-index:4;
+}
+/* 腰线下的细线 */
+.shaker-band2{
+  position:absolute;left:8px;right:8px;top:82px;height:1px;
+  background:linear-gradient(90deg, transparent, rgba(201,160,99,0.5), transparent);
+  z-index:4;
+}
+
+/* 摇动动画 */
+@keyframes shakeIt{
+  0%,100%{transform:rotate(0deg) translateX(0) translateY(0)}
+  12%{transform:rotate(-19deg) translateX(-11px) translateY(-5px)}
+  25%{transform:rotate(15deg) translateX(11px) translateY(2px)}
+  38%{transform:rotate(-17deg) translateX(-9px) translateY(-4px)}
+  50%{transform:rotate(13deg) translateX(9px) translateY(2px)}
+  62%{transform:rotate(-13deg) translateX(-7px) translateY(-3px)}
+  75%{transform:rotate(9deg) translateX(5px) translateY(1px)}
+  88%{transform:rotate(-5deg) translateX(-3px)}
+}
+.shaker.shaking{animation:shakeIt 0.9s cubic-bezier(.4,.1,.6,.9)}
+.shaker.lifted{transform:translateY(-175px) rotate(-28deg) scale(0.88);opacity:0}
+
+.roll-hint{
+  font-size:13px;color:var(--muted);margin-top:14px;text-align:center;
+  min-height:20px;letter-spacing:1px;transition:all .3s;font-style:italic;
+}
+
+/* ===== 3D 骰子 ===== */
+.dice-row{
+  position:absolute;
+  left:0;right:0;top:50%;
+  transform:translateY(-50%);
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+  align-items:center;perspective:700px;padding:0 6px;
+}
+
+.die3d{
+  width:42px;height:42px;position:relative;transform-style:preserve-3d;
+  transform:rotateX(-18deg) rotateY(-20deg);
+  transition:transform 1.2s cubic-bezier(.25,.6,.3,1);
+  animation:dieIn .5s cubic-bezier(.2,.8,.3,1.2) backwards;
+}
+@keyframes dieIn{0%{transform:scale(0.2) rotateX(-220deg) rotateY(90deg);opacity:0}100%{opacity:1}}
+
+.die-face{
+  position:absolute;width:42px;height:42px;border-radius:9px;
+  background:
+    radial-gradient(circle at 32% 26%, #FFFFFF 0%, #FFF6F9 45%, #F6E4EB 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:23px;color:var(--rose-deep);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255,255,255,0.95),
+    inset 0 -3px 6px rgba(196,112,142,0.13),
+    0 2px 7px rgba(196,112,142,0.16);
+  backface-visibility:hidden;
+  text-shadow:0 1px 1px rgba(255,255,255,0.9);
+}
+
+.die-face.f1{transform:translateZ(21px)}
+.die-face.f6{transform:rotateY(180deg) translateZ(21px)}
+.die-face.f4{transform:rotateY(90deg) translateZ(21px)}
+.die-face.f3{transform:rotateY(-90deg) translateZ(21px)}
+.die-face.f2{transform:rotateX(90deg) translateZ(21px)}
+.die-face.f5{transform:rotateX(-90deg) translateZ(21px)}
+
+.die3d[data-v="1"]{transform:rotateX(-18deg) rotateY(-20deg)}
+.die3d[data-v="6"]{transform:rotateX(-18deg) rotateY(160deg)}
+.die3d[data-v="4"]{transform:rotateX(-18deg) rotateY(70deg)}
+.die3d[data-v="3"]{transform:rotateX(-18deg) rotateY(-110deg)}
+.die3d[data-v="2"]{transform:rotateX(70deg) rotateY(-20deg)}
+.die3d[data-v="5"]{transform:rotateX(-110deg) rotateY(-20deg)}
+
+/* ===== 当前叫数 ===== */
+.current-bid{
+  text-align:center;padding:15px 12px;border-radius:14px;margin-bottom:14px;
+  background:linear-gradient(135deg, rgba(232,160,184,0.10), rgba(201,160,99,0.06));
+  border:1px solid rgba(201,160,99,0.18);
+  position:relative;
+}
+.current-bid::before,.current-bid::after{
+  content:'';position:absolute;top:50%;width:5px;height:5px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  transform:translateY(-50%);
+}
+.current-bid::before{left:10px}
+.current-bid::after{right:10px}
+.current-bid .bid-text{font-size:27px;font-weight:400;color:var(--rose-dark);letter-spacing:2px}
+.current-bid .bid-who{font-size:12px;color:var(--muted);margin-top:5px;letter-spacing:1px;font-style:italic}
+
+/* ===== 按钮 ===== */
+.btn{
+  padding:12px 22px;border:none;border-radius:13px;font-size:16px;font-weight:400;
+  cursor:pointer;transition:all .22s;letter-spacing:2px;
+  font-family:inherit;
+}
+.btn-primary{
+  background:linear-gradient(160deg, #F2B8CB 0%, #E8A0B8 40%, #D289A6 100%);
+  color:#fff;
+  box-shadow:
+    0 6px 18px rgba(196,112,142,0.32),
+    inset 0 1px 0 rgba(255,255,255,0.5),
+    inset 0 -2px 4px rgba(140,70,95,0.18);
+}
+.btn-primary:active{transform:translateY(1px) scale(0.98);box-shadow:0 3px 10px rgba(196,112,142,0.28)}
+
+.btn-danger{
+  background:linear-gradient(160deg, #C4708E 0%, #A85677 100%);
+  color:#fff;
+  box-shadow:
+    0 6px 18px rgba(142,74,99,0.34),
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    inset 0 -2px 4px rgba(90,35,58,0.25);
+}
+.btn-danger:active{transform:translateY(1px) scale(0.98)}
+
+.btn-ghost{
+  background:rgba(255,255,255,0.6);
+  color:var(--rose-deep);
+  border:1px solid rgba(201,160,99,0.35);
+  letter-spacing:1px;font-size:14px;
+}
+.btn-ghost:active{background:rgba(247,233,238,0.9)}
+.btn:disabled{opacity:0.35;cursor:not-allowed;transform:none!important}
+
+/* ===== 叫数控件 ===== */
+.bid-controls{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+
+.counter{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,0.75);
+  border-radius:13px;padding:7px 12px;
+  border:1px solid rgba(201,160,99,0.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 2px 8px rgba(196,112,142,0.07);
+}
+.counter button{
+  width:31px;height:31px;border:none;border-radius:9px;cursor:pointer;
+  background:linear-gradient(160deg, #F7D0DE, #EBB3C8);
+  color:var(--rose-dark);font-size:17px;font-weight:400;
+  box-shadow:0 2px 6px rgba(196,112,142,0.20), inset 0 1px 0 rgba(255,255,255,0.7);
+  transition:all .15s;font-family:inherit;
+}
+.counter button:active{transform:scale(0.92)}
+.counter .num{
+  font-size:21px;font-weight:400;color:var(--charcoal);
+  min-width:30px;text-align:center;letter-spacing:1px;
+}
+
+.fei-toggle{
+  display:flex;border-radius:13px;overflow:hidden;
+  border:1px solid rgba(201,160,99,0.25);
+  box-shadow:0 2px 8px rgba(196,112,142,0.07);
+}
+.fei-toggle button{
+  padding:9px 18px;border:none;background:rgba(255,255,255,0.75);
+  color:var(--muted);font-size:14px;cursor:pointer;transition:all .25s;
+  letter-spacing:2px;font-family:inherit;
+}
+.fei-toggle button.active{
+  background:linear-gradient(160deg, #E8A0B8, #D289A6);
+  color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+/* ===== 对手 ===== */
+.opponents{display:flex;gap:11px;justify-content:center;margin-bottom:14px;position:relative;z-index:1}
+.opponent{
+  flex:1;max-width:158px;padding:11px 8px;border-radius:15px;text-align:center;
+  background:rgba(255,255,255,0.62);
+  border:1px solid rgba(201,160,99,0.16);
+  box-shadow:0 3px 14px rgba(196,112,142,0.07);
+  transition:all .3s;
+}
+.opponent.active{
+  border-color:rgba(201,160,99,0.5);
+  background:rgba(255,255,255,0.92);
+  box-shadow:0 6px 22px rgba(196,112,142,0.16);
+  transform:translateY(-2px);
+}
+.opponent .name{font-size:14px;color:var(--charcoal);letter-spacing:1px}
+.opponent .status{font-size:11px;color:var(--muted);margin-top:3px;font-style:italic}
+
+/* ===== 历史 ===== */
+.history{max-height:170px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.history-item{
+  padding:8px 12px;border-bottom:1px solid rgba(232,160,184,0.14);
+  font-size:14px;color:var(--muted);display:flex;justify-content:space-between;
+  letter-spacing:0.5px;
+}
+.history-item:last-child{border:none}
+.history-item.mine{color:var(--rose-deep)}
+.history-item.open-item{color:#A85677;font-style:italic}
+
+/* ===== 结果 ===== */
+.result-box{padding:16px;border-radius:14px;text-align:center;font-size:16px;line-height:1.7;display:none;letter-spacing:0.5px}
+.result-box.show{display:block}
+.result-box.win{
+  background:linear-gradient(135deg, rgba(214,240,222,0.8), rgba(230,246,236,0.9));
+  color:#2E7D52;border:1px solid rgba(46,125,82,0.15);
+}
+.result-box.lose{
+  background:linear-gradient(135deg, rgba(252,230,236,0.9), rgba(253,240,244,0.9));
+  color:#A85677;border:1px solid rgba(168,86,119,0.18);
+}
+
+/* ===== Deerflow 签名 ===== */
+.deerflow-badge{
+  position:fixed;bottom:12px;right:14px;z-index:99;
+  font-size:10px;letter-spacing:2px;
+  color:rgba(201,160,99,0.55);
+  text-decoration:none;
+  padding:4px 10px;border-radius:20px;
+  border:1px solid rgba(201,160,99,0.18);
+  background:rgba(255,255,255,0.5);
+  backdrop-filter:blur(6px);
+  transition:all .35s;
+  font-family:Georgia,serif;
+}
+.deerflow-badge:hover{
+  color:rgba(201,160,99,0.95);
+  border-color:rgba(201,160,99,0.4);
+  background:rgba(255,255,255,0.85);
+  letter-spacing:2.5px;
+}
+.deerflow-badge::before{content:'✦ ';font-size:8px}
+
+.action-row{display:flex;gap:10px;justify-content:center;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div class="deco-arc"></div>
+
+<div class="header">
+  <div class="eyebrow">Dice Salon</div>
+  <h1>大话骰</h1>
+  <div class="rule">
+    <span class="line"></span>
+    <span>三个起叫 · 一为万能 · 斋飞翻倍</span>
+    <span class="line"></span>
+  </div>
+</div>
+
+<div class="opponents">
+  <div class="opponent" id="opp1">
+    <div class="name">小明</div>
+    <div class="status" id="opp1-status">等待中</div>
+  </div>
+  <div class="opponent" id="opp2">
+    <div class="name">阿虎</div>
+    <div class="status" id="opp2-status">等待中</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="label">SHAKE</div>
+  <div class="shaker-area" id="shaker-area">
+    <div class="shaker-scene">
+      <div class="table-mat"></div>
+      <div class="shaker" id="shaker">
+        <div class="shaker-body"></div>
+        <div class="shaker-band"></div>
+        <div class="shaker-band2"></div>
+        <div class="shaker-bottom"></div>
+      </div>
+      <div class="dice-row" id="my-dice" style="display:none"></div>
+    </div>
+    <div class="roll-hint" id="roll-hint">按住骰盅 · 左右滑动来摇</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="current-bid">
+    <div class="bid-text" id="bid-text">— 先摇骰 —</div>
+    <div class="bid-who" id="bid-who">滑动骰盅开始</div>
+  </div>
+
+  <div class="bid-controls">
+    <div class="counter">
+      <button onclick="changeCount(-1)">−</button>
+      <span class="num" id="count-num">3</span>
+      <button onclick="changeCount(1)">＋</button>
+    </div>
+    <div class="counter">
+      <button onclick="changeFace(-1)">−</button>
+      <span class="num" id="face-num">3</span>
+      <button onclick="changeFace(1)">＋</button>
+    </div>
+    <div class="fei-toggle">
+      <button id="btn-fei" class="active" onclick="setFei(true)">飞</button>
+      <button id="btn-zhai" onclick="setFei(false)">斋</button>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn btn-primary" id="btn-bid" onclick="placeBid()" disabled>叫数</button>
+    <button class="btn btn-danger" id="btn-open" onclick="openBid()" disabled>开</button>
+  </div>
+
+  <div class="result-box" id="result-box"></div>
+</div>
+
+<div class="card">
+  <div class="label">RECORD</div>
+  <div class="history" id="history">
+    <div class="history-item"><span>等待开始…</span></div>
+  </div>
+</div>
+
+<div class="action-row" style="margin-top:4px;position:relative;z-index:1">
+  <button class="btn btn-ghost" onclick="newGame()">重新开局</button>
+  <button class="btn btn-ghost" onclick="showRules()">规则</button>
+</div>
+
+<a href="https://deerflow.tech" target="_blank" class="deerflow-badge">Deerflow</a>
+
+<script>
+let state = {
+  myDice: [], opp1Dice: [], opp2Dice: [],
+  currentBid: null, lastBidder: null,
+  currentPlayer: 'me', history: [], gameOver: false, rolled: false
+};
+let uiCount = 3, uiFace = 3, uiFei = true;
+
+// ===== 音效 =====
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playClack(time, vol = 0.25) {
+  const ctx = getAudioCtx();
+  const dur = 0.04, bufSize = Math.floor(ctx.sampleRate * dur);
+  const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 4);
+  const src = ctx.createBufferSource(); src.buffer = buffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 1800 + Math.random() * 1500; filter.Q.value = 1.2;
+  const gain = ctx.createGain(); gain.gain.value = vol;
+  src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  src.start(time);
+}
+function playShakeSound(ms = 900) {
+  const ctx = getAudioCtx(), now = ctx.currentTime, count = Math.floor(ms / 70);
+  for (let i = 0; i < count; i++) playClack(now + i * 0.07 + Math.random() * 0.03, 0.14 + Math.random() * 0.14);
+}
+function playDiceLandSound() {
+  const ctx = getAudioCtx(), now = ctx.currentTime;
+  for (let i = 0; i < 5; i++) playClack(now + i * 0.08 + Math.random() * 0.04, 0.28);
+}
+
+// ===== 骰子逻辑 =====
+function generateDice() { return Array.from({length: 5}, () => Math.floor(Math.random() * 6) + 1); }
+function isStraight(dice) {
+  const s = [...dice].sort((a, b) => a - b).join('');
+  return s === '12345' || s === '23456';
+}
+function rollUntilNoStraight() {
+  let dice = generateDice(), rerolls = 0;
+  while (isStraight(dice)) { rerolls++; dice = generateDice(); }
+  return {dice, rerolls};
+}
+
+function renderDie(value) {
+  const pips = ['','⚀','⚁','⚂','⚃','⚄','⚅'];
+  return `<div class="die3d" data-v="${value}">
+    <div class="die-face f1">${pips[1]}</div>
+    <div class="die-face f2">${pips[2]}</div>
+    <div class="die-face f3">${pips[3]}</div>
+    <div class="die-face f4">${pips[4]}</div>
+    <div class="die-face f5">${pips[5]}</div>
+    <div class="die-face f6">${pips[6]}</div>
+  </div>`;
+}
+
+// ===== 滑动摇骰 =====
+const shakerArea = document.getElementById('shaker-area');
+const shakerEl = document.getElementById('shaker');
+let dragging = false, startX = 0, lastX = 0, swipeAccum = 0;
+
+shakerArea.addEventListener('touchstart', e => {
+  if (state.rolled) return;
+  dragging = true; startX = e.touches[0].clientX; lastX = startX; swipeAccum = 0;
+  shakerEl.style.transition = 'none';
+  getAudioCtx();
+}, {passive: true});
+
+shakerArea.addEventListener('touchmove', e => {
+  if (!dragging) return;
+  const x = e.touches[0].clientX, dx = x - lastX;
+  swipeAccum += Math.abs(dx); lastX = x;
+  const totalDx = x - startX;
+  shakerEl.style.transform = `translateX(${totalDx * 0.55}px) rotate(${totalDx * 0.13}deg)`;
+}, {passive: true});
+
+shakerArea.addEventListener('touchend', () => {
+  if (!dragging) return;
+  dragging = false; shakerEl.style.transition = '';
+  if (swipeAccum > 60) startRoll();
+  else { shakerEl.style.transform = ''; document.getElementById('roll-hint').textContent = '再多滑几下…'; }
+});
+
+// 鼠标（电脑测试）
+shakerArea.addEventListener('mousedown', e => {
+  if (state.rolled) return;
+  dragging = true; startX = e.clientX; lastX = startX; swipeAccum = 0;
+  shakerEl.style.transition = 'none'; getAudioCtx();
+});
+shakerArea.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX;
+  swipeAccum += Math.abs(dx); lastX = e.clientX;
+  const totalDx = e.clientX - startX;
+  shakerEl.style.transform = `translateX(${totalDx * 0.55}px) rotate(${totalDx * 0.13}deg)`;
+});
+document.addEventListener('mouseup', () => {
+  if (!dragging) return;
+  dragging = false; shakerEl.style.transition = '';
+  if (swipeAccum > 60) startRoll();
+  else shakerEl.style.transform = '';
+});
+
+// ===== 摇骰流程 =====
+function startRoll() {
+  if (state.rolled) return;
+  const hint = document.getElementById('roll-hint');
+
+  const my = rollUntilNoStraight();
+  const o1 = rollUntilNoStraight();
+  const o2 = rollUntilNoStraight();
+  state.myDice = my.dice; state.opp1Dice = o1.dice; state.opp2Dice = o2.dice;
+
+  playShakeSound(900);
+  shakerEl.style.transform = '';
+  shakerEl.classList.add('shaking');
+  hint.textContent = '摇动中…';
+
+  setTimeout(() => {
+    shakerEl.classList.remove('shaking');
+    shakerEl.classList.add('lifted');
+    playDiceLandSound();
+
+    setTimeout(() => {
+      const diceRow = document.getElementById('my-dice');
+      diceRow.style.display = 'flex';
+      diceRow.innerHTML = state.myDice.map(renderDie).join('');
+      state.rolled = true;
+
+      hint.textContent = my.rerolls > 0
+        ? `摇到顺子 · 自动重摇 ${my.rerolls} 次`
+        : '摇好了 · 可以叫数了';
+
+      document.getElementById('btn-bid').disabled = false;
+      document.getElementById('bid-text').textContent = '— 你先叫 —';
+      document.getElementById('bid-who').textContent = '三个起叫';
+    }, 450);
+  }, 900);
+}
+
+// ===== 叫数规则 =====
+function isValidBid(bid, lastBid) {
+  if (bid.count < 3) return {ok: false, msg: '至少三个起叫'};
+  if (!lastBid) return {ok: true};
+
+  if (!lastBid.fei && bid.fei) {
+    if (bid.count < lastBid.count * 2)
+      return {ok: false, msg: `斋转飞，数量要翻倍（至少${lastBid.count * 2}个）`};
+    if (bid.count === lastBid.count * 2 && bid.face < lastBid.face)
+      return {ok: false, msg: '数量相同时，点数不能变小'};
+    return {ok: true};
+  }
+
+  if (lastBid.fei && !bid.fei) {
+    if (bid.count > lastBid.count) return {ok: true};
+    if (bid.count === lastBid.count && bid.face > lastBid.face) return {ok: true};
+    return {ok: false, msg: '转斋要加数量或加点数'};
+  }
+
+  if (bid.count > lastBid.count) return {ok: true};
+  if (bid.count === lastBid.count && bid.face > lastBid.face) return {ok: true};
+  return {ok: false, msg: '必须叫得比上家大'};
+}
+
+function countFace(allDice, face, fei) {
+  let c = 0;
+  for (const d of allDice) {
+    if (d === face) c++;
+    else if (d === 1 && fei && face !== 1) c++;
+  }
+  return c;
+}
+
+// ===== 渲染 =====
+function render() {
+  if (state.currentBid) {
+    const b = state.currentBid;
+    const who = state.lastBidder === 'me' ? '你' : (state.lastBidder === 'opp1' ? '小明' : '阿虎');
+    document.getElementById('bid-text').textContent = `${b.count} 个 ${b.face} ${b.fei ? '飞' : '斋'}`;
+    document.getElementById('bid-who').textContent = `${who} 叫的`;
+  }
+
+  const hist = document.getElementById('history');
+  if (state.history.length === 0) {
+    hist.innerHTML = '<div class="history-item"><span>等待开始…</span></div>';
+  } else {
+    hist.innerHTML = state.history.map(h => {
+      if (h.type === 'open') return `<div class="history-item open-item"><span>${h.text}</span></div>`;
+      return `<div class="history-item ${h.mine ? 'mine' : ''}"><span>${h.who}</span><span>${h.text}</span></div>`;
+    }).join('');
+    hist.scrollTop = hist.scrollHeight;
+  }
+
+  document.getElementById('opp1').classList.toggle('active', state.currentPlayer === 'opp1');
+  document.getElementById('opp2').classList.toggle('active', state.currentPlayer === 'opp2');
+}
+
+// ===== 控件 =====
+function changeCount(d) {
+  uiCount = Math.max(3, Math.min(20, uiCount + d));
+  document.getElementById('count-num').textContent = uiCount;
+}
+function changeFace(d) {
+  uiFace = ((uiFace - 1 + d + 6) % 6) + 1;
+  document.getElementById('face-num').textContent = uiFace;
+}
+function setFei(fei) {
+  uiFei = fei;
+  document.getElementById('btn-fei').classList.toggle('active', fei);
+  document.getElementById('btn-zhai').classList.toggle('active', !fei);
+}
+
+// ===== 玩家叫数 =====
+function placeBid() {
+  if (state.gameOver || state.currentPlayer !== 'me' || !state.rolled) return;
+  const bid = {count: uiCount, face: uiFace, fei: uiFei};
+  const chk = isValidBid(bid, state.currentBid);
+  if (!chk.ok) { alert('❌ ' + chk.msg); return; }
+
+  state.currentBid = bid;
+  state.lastBidder = 'me';
+  state.history.push({who: '你', text: `${bid.count} 个 ${bid.face} ${bid.fei ? '飞' : '斋'}`, mine: true});
+
+  state.currentPlayer = 'opp1';
+  document.getElementById('btn-bid').disabled = true;
+  document.getElementById('btn-open').disabled = true;
+  document.getElementById('opp1-status').textContent = '思考中…';
+
+  render();
+  setTimeout(aiTurn, 1100);
+}
+
+// ===== AI =====
+function aiTurn() {
+  if (state.gameOver) return;
+  const player = state.currentPlayer;
+  if (player === 'me') return;
+  const myDice = player === 'opp1' ? state.opp1Dice : state.opp2Dice;
+  const name = player === 'opp1' ? '小明' : '阿虎';
+  const statusEl = document.getElementById(player + '-status');
+  statusEl.textContent = '思考中…';
+
+  const bid = aiDecide(myDice, state.currentBid);
+  if (bid === 'open') {
+    state.history.push({type: 'open', text: `${name} 开`});
+    resolveOpen(name);
+    return;
+  }
+
+  state.currentBid = bid;
+  state.lastBidder = player;
+  state.history.push({who: name, text: `${bid.count} 个 ${bid.face} ${bid.fei ? '飞' : '斋'}`});
+  statusEl.textContent = '已叫数';
+
+  if (player === 'opp1') {
+    state.currentPlayer = 'opp2';
+    document.getElementById('opp2-status').textContent = '思考中…';
+    render();
+    setTimeout(aiTurn, 1100);
+  } else {
+    state.currentPlayer = 'me';
+    render();
+    document.getElementById('btn-bid').disabled = false;
+    document.getElementById('btn-open').disabled = false;
+    document.getElementById('bid-who').textContent = '轮到你 — 叫数 or 开';
+  }
+}
+
+function aiDecide(myDice, lastBid) {
+  if (!lastBid) {
+    const counts = {};
+    for (const d of myDice) counts[d] = (counts[d] || 0) + 1;
+    let bestFace = 3, bestCount = 0;
+    for (const [f, c] of Object.entries(counts)) {
+      if (f !== '1' && c > bestCount) { bestCount = c; bestFace = parseInt(f); }
+    }
+    return {count: 3, face: bestFace, fei: true};
+  }
+  const expected = 15 / 6 * (lastBid.fei && lastBid.face !== 1 ? 1.17 : 1);
+  if (lastBid.count > expected * 2 && Math.random() < 0.4) return 'open';
+
+  if (Math.random() < 0.3) {
+    if (lastBid.face < 6) return {count: lastBid.count, face: lastBid.face + 1, fei: lastBid.fei};
+    return {count: lastBid.count + 1, face: 2, fei: lastBid.fei};
+  }
+  return {count: lastBid.count + 1, face: lastBid.face, fei: lastBid.fei};
+}
+
+// ===== 开 =====
+function openBid() {
+  if (state.gameOver || state.currentPlayer !== 'me' || !state.rolled) return;
+  if (!state.currentBid) { alert('还没人叫数'); return; }
+  state.history.push({type: 'open', text: '你 开'});
+  resolveOpen('你');
+}
+
+function resolveOpen(opener) {
+  state.gameOver = true;
+  const bid = state.currentBid;
+  const all = [...state.myDice, ...state.opp1Dice, ...state.opp2Dice];
+  const actual = countFace(all, bid.face, bid.fei);
+  const bidder = state.lastBidder === 'me' ? '你' : (state.lastBidder === 'opp1' ? '小明' : '阿虎');
+
+  const detail = `
+    <div style="margin-bottom:8px;font-size:14px;opacity:0.85">你 · ${state.myDice.join(' ')}</div>
+    <div style="margin-bottom:8px;font-size:14px;opacity:0.85">小明 · ${state.opp1Dice.join(' ')}</div>
+    <div style="margin-bottom:8px;font-size:14px;opacity:0.85">阿虎 · ${state.opp2Dice.join(' ')}</div>
+    <div style="margin-top:14px;font-size:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.08)">
+      叫的 ${bid.count} 个 ${bid.face}${bid.fei ? '飞' : '斋'}，实有 ${actual} 个
+    </div>`;
+
+  const box = document.getElementById('result-box');
+  box.classList.add('show');
+
+  if (actual >= bid.count) {
+    box.className = 'result-box show lose';
+    box.innerHTML = `<div style="font-size:19px;margin-bottom:10px">开错了</div>
+      <div style="margin-bottom:12px">数量够了 · ${opener} 喝一口</div>${detail}`;
+  } else {
+    box.className = 'result-box show win';
+    box.innerHTML = `<div style="font-size:19px;margin-bottom:10px">开对了</div>
+      <div style="margin-bottom:12px">${bidder} 吹牛 · 喝一口</div>${detail}`;
+  }
+
+  document.getElementById('btn-bid').disabled = true;
+  document.getElementById('btn-open').disabled = true;
+  render();
+}
+
+// ===== 新局 =====
+function newGame() {
+  state = {
+    myDice: [], opp1Dice: [], opp2Dice: [],
+    currentBid: null, lastBidder: null,
+    currentPlayer: 'me', history: [], gameOver: false, rolled: false
+  };
+  uiCount = 3; uiFace = 3; uiFei = true;
+  document.getElementById('count-num').textContent = 3;
+  document.getElementById('face-num').textContent = 3;
+  setFei(true);
+
+  shakerEl.classList.remove('shaking', 'lifted');
+  shakerEl.style.transform = '';
+  document.getElementById('roll-hint').textContent = '按住骰盅 · 左右滑动来摇';
+  document.getElementById('my-dice').style.display = 'none';
+  document.getElementById('my-dice').innerHTML = '';
+  document.getElementById('btn-bid').disabled = true;
+  document.getElementById('btn-open').disabled = true;
+
+  const box = document.getElementById('result-box');
+  box.classList.remove('show'); box.innerHTML = ''; box.className = 'result-box';
+
+  document.getElementById('bid-text').textContent = '— 先摇骰 —';
+  document.getElementById('bid-who').textContent = '滑动骰盅开始';
+  document.getElementById('opp1-status').textContent = '等待中';
+  document.getElementById('opp2-status').textContent = '等待中';
+
+  render();
+}
+
+function showRules() {
+  alert(`【基本】三个起叫，每人五颗骰
+【叫数】加数量 或 同数量加点数
+【一为万能】1可当任何点数
+【斋飞】
+· 飞：1是万能
+· 斋：1不算万能
+· 斋转飞：数量翻倍（3个3斋 → 6个3飞）
+【顺子】摇到 12345 / 23456 要重摇（自动）
+【开】数量不够→叫的人喝；够了→开的人喝
+【罚】输一口`);
+}
+
+newGame();
+</script>
+</body>
+</html>

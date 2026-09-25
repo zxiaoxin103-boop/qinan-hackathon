@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=2.0,user-scalable=no">
+<title>真心话 · 大冒险</title>
+<style>
+:root{
+  --bg-deep:#2A1622;
+  --bg-mid:#4A2438;
+  --rose:#F2A2B5;
+  --rose-bright:#FFB8CC;
+  --rose-deep:#C4708E;
+  --berry:#8E4A63;
+  --gold:#E3C88F;
+  --gold-deep:#C9A063;
+  --cream:#FFF6F8;
+  --truth:#E88BA3;
+  --dare:#9B6BC4;
+  --text:#3D2B33;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, #5A2C42 0%, transparent 55%),
+    radial-gradient(ellipse 80% 50% at 50% 100%, #3D1E2E 0%, transparent 50%),
+    linear-gradient(170deg, #2A1622 0%, #381D2C 100%);
+  font-family:Georgia,'Songti SC','Noto Serif SC','STSong',serif;
+  min-height:100vh;
+  padding:24px 18px 50px;
+  -webkit-user-select:none;user-select:none;
+  overflow-x:hidden;
+  color:var(--cream);
+  position:relative;
+  display:flex;flex-direction:column;
+}
+
+/* 星点装饰 */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.5;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,200,220,0.55), transparent),
+    radial-gradient(1px 1px at 78% 12%, rgba(255,220,235,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 88% 62%, rgba(227,200,143,0.45), transparent),
+    radial-gradient(1px 1px at 22% 78%, rgba(255,200,220,0.4), transparent),
+    radial-gradient(1px 1px at 62% 88%, rgba(255,220,235,0.35), transparent),
+    radial-gradient(1.5px 1.5px at 42% 8%, rgba(227,200,143,0.4), transparent);
+}
+
+/* ===== 标题 ===== */
+.header{text-align:center;margin-bottom:22px;position:relative;z-index:2}
+.header .eyebrow{
+  font-size:10px;letter-spacing:5px;color:rgba(227,200,143,0.8);
+  text-transform:uppercase;margin-bottom:9px;
+}
+.header h1{
+  font-size:28px;letter-spacing:8px;font-weight:400;
+  background:linear-gradient(135deg,#FFD4E0,#F2A2B5 40%,#E3C88F);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 2px 12px rgba(242,162,181,0.35));
+}
+.header .sub{
+  font-size:11px;color:rgba(255,246,248,0.45);letter-spacing:3px;margin-top:8px;
+}
+
+/* ===== 卡片舞台 ===== */
+.card-stage{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  perspective:1400px;position:relative;z-index:2;min-height:360px;
+  margin-bottom:22px;
+}
+
+.game-card{
+  width:min(88vw,340px);height:min(62vh,440px);
+  position:relative;transform-style:preserve-3d;
+  transition:transform .75s cubic-bezier(.4,.2,.2,1);
+  cursor:pointer;
+}
+.game-card.flipped{transform:rotateY(180deg)}
+
+.card-face{
+  position:absolute;inset:0;border-radius:26px;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px 24px;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.42),
+    0 0 0 1px rgba(255,255,255,0.10) inset,
+    0 1px 0 rgba(255,255,255,0.22) inset;
+  overflow:hidden;
+}
+
+/* 卡片正面（封面） */
+.card-front{
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 18%, rgba(255,205,225,0.30), transparent 65%),
+    linear-gradient(160deg, #7A3D56 0%, #5A2C42 45%, #40202F 100%);
+}
+.card-front::before{
+  content:'';position:absolute;inset:14px;border-radius:18px;
+  border:1px solid rgba(227,200,143,0.28);
+  pointer-events:none;
+}
+.card-front::after{
+  content:'';position:absolute;width:180px;height:180px;border-radius:50%;
+  border:1px solid rgba(227,200,143,0.14);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.front-emblem{
+  font-size:52px;margin-bottom:18px;
+  filter:drop-shadow(0 4px 14px rgba(242,162,181,0.5));
+  animation:floatEmblem 3.5s ease-in-out infinite;
+}
+@keyframes floatEmblem{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.front-title{
+  font-size:23px;letter-spacing:6px;color:#FFE6EF;
+  text-align:center;line-height:1.7;
+  text-shadow:0 2px 12px rgba(242,162,181,0.4);
+}
+.front-hint{
+  margin-top:22px;font-size:12px;color:rgba(255,230,239,0.55);
+  letter-spacing:2.5px;font-style:italic;
+  animation:pulseHint 2.4s ease-in-out infinite;
+}
+@keyframes pulseHint{0%,100%{opacity:0.45}50%{opacity:0.9}}
+
+/* 卡片背面（题目） */
+.card-back{
+  transform:rotateY(180deg);
+  justify-content:flex-start;
+  padding-top:34px;
+}
+.card-back.truth{
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(255,255,255,0.28), transparent 55%),
+    linear-gradient(165deg, #F7C6D6 0%, #E88BA3 60%, #D4788F 100%);
+}
+.card-back.dare{
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(255,255,255,0.24), transparent 55%),
+    linear-gradient(165deg, #C9A6E0 0%, #9B6BC4 60%, #7E52A8 100%);
+}
+.card-back::before{
+  content:'';position:absolute;inset:14px;border-radius:18px;
+  border:1px solid rgba(255,255,255,0.30);pointer-events:none;
+}
+
+.back-type{
+  font-size:13px;letter-spacing:6px;color:rgba(255,255,255,0.92);
+  padding:6px 18px;border-radius:20px;
+  background:rgba(255,255,255,0.18);
+  border:1px solid rgba(255,255,255,0.3);
+  margin-bottom:22px;
+}
+.back-question{
+  font-size:20px;line-height:1.85;color:#3D2B33;
+  text-align:center;letter-spacing:1px;
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:0 4px;
+  text-shadow:0 1px 0 rgba(255,255,255,0.35);
+}
+.back-footer{
+  font-size:11px;color:rgba(61,43,51,0.5);letter-spacing:2px;
+  margin-top:16px;font-style:italic;
+}
+
+/* 抽到新题的弹入动画 */
+@keyframes questionIn{
+  0%{opacity:0;transform:translateY(14px) scale(0.96)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+.back-question.animate{animation:questionIn .45s cubic-bezier(.2,.8,.3,1.1)}
+
+/* ===== 按钮 ===== */
+.btn-group{
+  display:flex;gap:12px;justify-content:center;position:relative;z-index:2;
+  margin-bottom:16px;
+}
+
+.choice-btn{
+  flex:1;max-width:112px;
+  padding:15px 8px;border:none;border-radius:18px;
+  font-size:15px;letter-spacing:2.5px;cursor:pointer;
+  font-family:inherit;color:#fff;
+  transition:all .22s;
+  position:relative;overflow:hidden;
+}
+.choice-btn:active{transform:translateY(2px) scale(0.97)}
+
+.choice-btn.truth-btn{
+  background:linear-gradient(160deg,#F5B2C6,#E88BA3 55%,#D4788F);
+  box-shadow:
+    0 8px 24px rgba(232,139,163,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.45),
+    inset 0 -2px 5px rgba(150,60,85,0.20);
+}
+.choice-btn.dare-btn{
+  background:linear-gradient(160deg,#BFA0DC,#9B6BC4 55%,#7E52A8);
+  box-shadow:
+    0 8px 24px rgba(155,107,196,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.40),
+    inset 0 -2px 5px rgba(80,40,120,0.25);
+}
+.choice-btn.random-btn{
+  background:linear-gradient(160deg,#EFD9A8,#E3C88F 55%,#C9A063);
+  color:#5A4225;
+  box-shadow:
+    0 8px 24px rgba(201,160,99,0.36),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -2px 5px rgba(140,100,40,0.18);
+}
+
+/* ===== 底部小工具 ===== */
+.tools{
+  display:flex;gap:12px;justify-content:center;position:relative;z-index:2;
+}
+.tool-btn{
+  padding:9px 18px;border:1px solid rgba(227,200,143,0.25);
+  border-radius:14px;background:rgba(255,246,248,0.06);
+  color:rgba(255,230,239,0.7);font-size:12.5px;letter-spacing:1.5px;
+  cursor:pointer;font-family:inherit;transition:all .25s;
+}
+.tool-btn:active{background:rgba(255,246,248,0.14)}
+
+/* ===== 计数 ===== */
+.counter-badge{
+  position:fixed;top:14px;right:16px;z-index:5;
+  font-size:11px;letter-spacing:2px;
+  color:rgba(227,200,143,0.65);
+  padding:5px 12px;border-radius:16px;
+  background:rgba(255,246,248,0.05);
+  border:1px solid rgba(227,200,143,0.16);
+}
+
+/* ===== 设置面板 ===== */
+.panel{
+  position:fixed;inset:0;z-index:20;
+  background:rgba(30,14,22,0.88);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+.panel.show{display:flex}
+.panel-box{
+  width:100%;max-width:340px;max-height:76vh;overflow-y:auto;
+  background:linear-gradient(165deg,#4A2438,#331A28);
+  border-radius:22px;padding:24px 20px;
+  border:1px solid rgba(227,200,143,0.22);
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+.panel-box h3{
+  font-size:17px;color:#FFE6EF;letter-spacing:3px;
+  text-align:center;margin-bottom:18px;font-weight:400;
+}
+.panel-box p{
+  font-size:13px;color:rgba(255,230,239,0.75);
+  line-height:2;letter-spacing:1px;
+}
+.panel-close{
+  width:100%;margin-top:20px;padding:13px;border:none;
+  border-radius:14px;
+  background:linear-gradient(160deg,#F5B2C6,#E88BA3);
+  color:#fff;font-size:15px;letter-spacing:3px;
+  cursor:pointer;font-family:inherit;
+}
+
+/* ===== Deerflow ===== */
+.deerflow-badge{
+  position:fixed;bottom:12px;right:14px;z-index:99;
+  font-size:10px;letter-spacing:2px;
+  color:rgba(227,200,143,0.45);
+  text-decoration:none;padding:4px 10px;border-radius:20px;
+  border:1px solid rgba(227,200,143,0.15);
+  background:rgba(255,246,248,0.04);
+  backdrop-filter:blur(6px);
+  transition:all .35s;
+}
+.deerflow-badge:hover{color:rgba(227,200,143,0.9);border-color:rgba(227,200,143,0.35)}
+.deerflow-badge::before{content:'✦ ';font-size:8px}
+</style>
+</head>
+<body>
+
+<div class="counter-badge" id="counter">已玩 0 次</div>
+
+<div class="header">
+  <div class="eyebrow">Party Game</div>
+  <h1>真心话 · 大冒险</h1>
+  <div class="sub">点卡片翻牌 · 选一个开始</div>
+</div>
+
+<div class="card-stage">
+  <div class="game-card" id="gameCard" onclick="flipCard()">
+    <!-- 正面 -->
+    <div class="card-face card-front">
+      <div class="front-emblem">🎴</div>
+      <div class="front-title">真心话<br>or<br>大冒险</div>
+      <div class="front-hint">点一下 翻牌</div>
+    </div>
+    <!-- 背面 -->
+    <div class="card-face card-back truth" id="cardBack">
+      <div class="back-type" id="backType">真心话</div>
+      <div class="back-question" id="backQuestion">选一个开始吧</div>
+      <div class="back-footer" id="backFooter">翻回卡片继续</div>
+    </div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <button class="choice-btn truth-btn" onclick="draw('truth')">真心话</button>
+  <button class="choice-btn random-btn" onclick="draw('random')">随机</button>
+  <button class="choice-btn dare-btn" onclick="draw('dare')">大冒险</button>
+</div>
+
+<div class="tools">
+  <button class="tool-btn" onclick="newRound()">换一题</button>
+  <button class="tool-btn" onclick="showPanel()">玩法说明</button>
+</div>
+
+<div class="panel" id="panel">
+  <div class="panel-box">
+    <h3>怎么玩</h3>
+    <p>
+      1. 大家围坐，手机放中间<br>
+      2. 点「真心话」「大冒险」或「随机」抽题<br>
+      3. 抽到的人必须完成题目<br>
+      4. 完成后点卡片翻回，换下一个人<br>
+      5. 拒绝完成 → 罚一杯 / 罚一个表演
+      <br><br>
+      <span style="color:#E3C88F">小提示：</span><br>
+      · 玩之前先商量好尺度<br>
+      · 抽到不想做的可以「换一题」（限次数）<br>
+      · 开心最重要，别较真 😊
+    </p>
+    <button class="panel-close" onclick="hidePanel()">知道了</button>
+  </div>
+</div>
+
+<a href="https://deerflow.tech" target="_blank" class="deerflow-badge">Deerflow</a>
+
+<script>
+// ===== 题库 =====
+const TRUTHS = [
+  '你最近一次哭是因为什么？',
+  '你做过最尴尬的一件事是什么？',
+  '你手机里最不想被别人看到的App是什么？',
+  '你有没有暗恋过在场的人？',
+  '你最想删掉的一段黑历史是什么？',
+  '你做过最叛逆的事是什么？',
+  '你最近一次撒谎是什么时候？撒了什么谎？',
+  '你朋友圈屏蔽过谁？为什么？',
+  '你最后悔的一件事是什么？',
+  '你觉得自己最大的缺点是什么？',
+  '你有没有背着朋友说过ta坏话？',
+  '你最近一次"社死"是什么场景？',
+  '你最喜欢在座的哪一个人？（不许说都）',
+  '如果有时光机，你最想回到哪一刻？',
+  '你偷偷羡慕过在座的谁？羡慕什么？',
+  '你有没有说过谎话逃过惩罚？',
+  '你最近一次心跳加速是因为什么？',
+  '你最不想让爸妈知道的一件事是什么？',
+  '如果明天不用上学，你最想去干什么？',
+  '你在座的人里最想跟谁互换人生？为什么？',
+  '你有没有过"表面开心，心里难受"的时候？',
+  '你最在意别人怎么评价你哪一点？'
+];
+
+const DARES = [
+  '给微信列表第5个人发「我想你了」',
+  '学一种动物叫，直到有人笑为止',
+  '让左边的人在你脸上画一笔',
+  '打电话给一个朋友，唱两句生日歌',
+  '用最夸张的表情自拍一张',
+  '模仿在座某个人的说话方式',
+  '让在座的人指定你做一个动作',
+  '闭眼摸一个人的手，猜是谁',
+  '用嘴叼着一样东西说一段绕口令',
+  '对着镜子夸自己30秒，不许停',
+  '让在座的人翻你手机相册的最近一张照片',
+  '原声朗读你最近一条聊天记录',
+  '做一个你从没做过的表情包脸，保持10秒',
+  '让右边的人问你一个问题，必须诚实回答',
+  '用方言说一句表白的话',
+  '对着空气深情告白10秒',
+  '让在座的人给你取一个新外号，今天都要用',
+  '原地转10圈，然后走直线',
+  '唱一首歌的副歌部分',
+  '给通讯录里最后一个联系人群发一个表情',
+  '学一段广告词，要声情并茂',
+  '让在座的人给你摆一个pose，拍照留念'
+];
+
+// ===== 状态 =====
+let flipped = false;
+let count = 0;
+let lastIndex = {truth: -1, dare: -1};
+
+// ===== 翻牌 =====
+function flipCard() {
+  const card = document.getElementById('gameCard');
+  if (!card.classList.contains('flipped')) {
+    // 没抽题时点卡片，随机抽
+    draw('random');
+    return;
+  }
+  flipped = false;
+  card.classList.remove('flipped');
+}
+
+// ===== 抽题 =====
+function draw(type) {
+  const card = document.getElementById('gameCard');
+  const back = document.getElementById('cardBack');
+  const typeEl = document.getElementById('backType');
+  const qEl = document.getElementById('backQuestion');
+  const footerEl = document.getElementById('backFooter');
+
+  // 随机决定
+  let actual = type;
+  if (type === 'random') {
+    actual = Math.random() < 0.5 ? 'truth' : 'dare';
+  }
+
+  // 抽题（避免连续重复）
+  const pool = actual === 'truth' ? TRUTHS : DARES;
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * pool.length);
+  } while (pool.length > 1 && idx === lastIndex[actual]);
+  lastIndex[actual] = idx;
+
+  // 设置内容
+  back.className = 'card-face card-back ' + actual;
+  typeEl.textContent = actual === 'truth' ? '真心话' : '大冒险';
+  qEl.textContent = pool[idx];
+  qEl.classList.remove('animate');
+  void qEl.offsetWidth; // 重置动画
+  qEl.classList.add('animate');
+  footerEl.textContent = actual === 'truth' ? '必须诚实回答哦' : '不许拒绝，冲！';
+
+  // 翻牌
+  if (!card.classList.contains('flipped')) {
+    card.classList.add('flipped');
+  }
+  flipped = true;
+
+  // 计数
+  count++;
+  document.getElementById('counter').textContent = `已玩 ${count} 次`;
+}
+
+// ===== 换一题 =====
+function newRound() {
+  const card = document.getElementById('gameCard');
+  if (!card.classList.contains('flipped')) {
+    draw('random');
+    return;
+  }
+  // 从当前类型再抽一题
+  const current = document.getElementById('cardBack').classList.contains('truth') ? 'truth' : 'dare';
+  draw(current);
+}
+
+// ===== 面板 =====
+function showPanel() {
+  document.getElementById('panel').classList.add('show');
+}
+function hidePanel() {
+  document.getElementById('panel').classList.remove('show');
+}
+
+// 点背景关闭
+document.getElementById('panel').addEventListener('click', e => {
+  if (e.target.id === 'panel') hidePanel();
+});
+</script>
+</body>
+</html>
