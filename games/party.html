@@ -386,6 +386,21 @@ body{
 }
 .deerflow-badge:hover{color:rgba(168,86,119,0.85);border-color:rgba(212,120,143,0.4)}
 .deerflow-badge::before{content:'✦ ';font-size:8px}
+
+/* ===== 页面内提示（Toast）===== */
+.toast{
+  position:fixed;bottom:76px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:linear-gradient(160deg,rgba(212,120,143,0.96),rgba(168,86,119,0.96));
+  color:#fff;padding:12px 22px;border-radius:14px;
+  font-size:14px;letter-spacing:0.5px;max-width:82%;
+  text-align:center;line-height:1.6;
+  opacity:0;transition:all .3s cubic-bezier(.2,.8,.3,1.1);
+  pointer-events:none;z-index:200;
+  box-shadow:0 8px 26px rgba(168,86,119,0.36);
+  backdrop-filter:blur(10px);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -504,6 +519,9 @@ body{
 </div>
 
 <a href="https://deerflow.tech" target="_blank" class="deerflow-badge">Deerflow</a>
+
+<!-- 页面内提示 -->
+<div class="toast" id="toast"></div>
 
 <script>
 // ==================== 题库 ====================
@@ -741,7 +759,7 @@ function buildWheel() {
 
 function spinWheel() {
   if (spinning) return;
-  if (players.length < 2) { alert('至少要有2个玩家哦（点"玩家设置"添加）'); return; }
+  if (players.length < 2) { showToast('至少要有2个玩家哦（点"玩家设置"添加）'); return; }
   spinning = true;
   document.getElementById('spinBtn').disabled = true;
   document.getElementById('wheelResult').textContent = '转啊转…';
@@ -789,6 +807,15 @@ function savePlayers() {
   buildWheel();
   document.getElementById('playerPanel').classList.remove('show');
   document.getElementById('wheelResult').textContent = '转一下，看谁中奖';
+}
+
+// ==================== 页面内提示 ====================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
 // ==================== 面板 ====================

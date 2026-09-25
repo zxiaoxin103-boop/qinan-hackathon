@@ -411,6 +411,51 @@ body::after{
 }
 .deerflow-badge::before{content:'✦ ';font-size:8px}
 
+/* ===== 页面内提示（Toast）===== */
+.toast{
+  position:fixed;bottom:76px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:linear-gradient(160deg,rgba(196,112,142,0.96),rgba(168,86,119,0.96));
+  color:#fff;padding:12px 22px;border-radius:14px;
+  font-size:14px;letter-spacing:0.5px;max-width:82%;
+  text-align:center;line-height:1.6;
+  opacity:0;transition:all .3s cubic-bezier(.2,.8,.3,1.1);
+  pointer-events:none;z-index:200;
+  box-shadow:0 8px 26px rgba(142,74,99,0.36);
+  backdrop-filter:blur(10px);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== 规则浮层 ===== */
+.rules-panel{
+  position:fixed;inset:0;z-index:150;
+  background:rgba(60,30,45,0.55);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+.rules-panel.show{display:flex}
+.rules-box{
+  width:100%;max-width:340px;max-height:76vh;overflow-y:auto;
+  background:rgba(255,255,255,0.94);
+  border-radius:22px;padding:24px 20px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.35);
+}
+.rules-box h3{
+  font-size:17px;color:#C4708E;letter-spacing:3px;
+  text-align:center;margin-bottom:14px;font-weight:600;
+}
+.rules-box p{
+  font-size:14px;color:#5A3D4A;line-height:2;letter-spacing:0.5px;
+  white-space:pre-line;
+}
+.rules-close{
+  width:100%;margin-top:16px;padding:13px;border:none;
+  border-radius:14px;
+  background:linear-gradient(160deg,#F2B8CB,#D289A6);
+  color:#fff;font-size:15px;letter-spacing:3px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+}
+
 .action-row{display:flex;gap:10px;justify-content:center;margin-top:8px}
 </style>
 </head>
@@ -500,6 +545,18 @@ body::after{
 </div>
 
 <a href="https://deerflow.tech" target="_blank" class="deerflow-badge">Deerflow</a>
+
+<!-- 页面内提示 -->
+<div class="toast" id="toast"></div>
+
+<!-- 规则浮层 -->
+<div class="rules-panel" id="rulesPanel">
+  <div class="rules-box">
+    <h3>游戏规则</h3>
+    <p id="rulesText"></p>
+    <button class="rules-close" onclick="hideRules()">知道了</button>
+  </div>
+</div>
 
 <script>
 let state = {
@@ -723,7 +780,7 @@ function placeBid() {
   if (state.gameOver || state.currentPlayer !== 'me' || !state.rolled) return;
   const bid = {count: uiCount, face: uiFace, fei: uiFei};
   const chk = isValidBid(bid, state.currentBid);
-  if (!chk.ok) { alert('❌ ' + chk.msg); return; }
+  if (!chk.ok) { showToast('❌ ' + chk.msg); return; }
 
   state.currentBid = bid;
   state.lastBidder = 'me';
@@ -797,7 +854,7 @@ function aiDecide(myDice, lastBid) {
 // ===== 开 =====
 function openBid() {
   if (state.gameOver || state.currentPlayer !== 'me' || !state.rolled) return;
-  if (!state.currentBid) { alert('还没人叫数'); return; }
+  if (!state.currentBid) { showToast('还没人叫数'); return; }
   state.history.push({type: 'open', text: '你 开'});
   resolveOpen('你');
 }
@@ -866,17 +923,41 @@ function newGame() {
   render();
 }
 
+// ===== 页面内提示 =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
 function showRules() {
-  alert(`【基本】三个起叫，每人五颗骰
+  document.getElementById('rulesText').textContent =
+`【基本】三个起叫，每人五颗骰
+
 【叫数】加数量 或 同数量加点数
+
 【一为万能】1可当任何点数
+
 【斋飞】
 · 飞：1是万能
 · 斋：1不算万能
-· 斋转飞：数量翻倍（3个3斋 → 6个3飞）
+· 斋转飞：数量翻倍
+  （3个3斋 → 6个3飞）
+
 【顺子】摇到 12345 / 23456 要重摇（自动）
-【开】数量不够→叫的人喝；够了→开的人喝
-【罚】输一口`);
+
+【开】
+· 数量不够 → 叫的人喝
+· 数量够了 → 开的人喝
+
+【罚】输一口 🍺`;
+  document.getElementById('rulesPanel').classList.add('show');
+}
+
+function hideRules() {
+  document.getElementById('rulesPanel').classList.remove('show');
 }
 
 newGame();
